@@ -46,3 +46,21 @@ Specify a macro with
 ```
 %<variable>
 ```
+
+#### an example
+```
+[config]
+app="bind"
+version="9.10.4-P6"
+build_path="/tmp/build"
+install_path="/usr/local/bind/%version"
+url="https://www.isc.org/downloads/file/%version/la_%version/bind-9.10.4-p6/?version=tar-gz"
+archive_type="tgz"
+prebuild_command="patch -p < somepatch"
+build_opts="./configure --enable-ipv6 --with-ecdsa --with-openssl=/usr/local/openssl/current --prefix=/usr/local/bind/%version --enable-rrl"
+make="make"
+install="make install"
+postbuild_command="ln -s something"
+keep_build=false
+```
+To get more info about the parameters check build_example.conf
