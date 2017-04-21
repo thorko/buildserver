@@ -24,5 +24,5 @@ make clean
 ## Usage
 To build an app from source run
 ```
-tkctl -r build -b /etc/tkctl/dovecot.conf
+buildctl -r build -b /etc/buildctl/dovecot.conf
 ```

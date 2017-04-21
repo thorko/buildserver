@@ -1,0 +1,12 @@
+[Unit]
+Description=A simple http file server
+After=network.target nss-lookup.target
+
+[Service]
+Type=simple
+User=daemon
+ExecStart=/usr/local/sbin/buildsrv -c /etc/buildctl/buildsrv.conf
+ExecStop=/bin/kill -WINCH ${MAINPID}
+
+[Install]
+WantedBy=multi-user.target

@@ -2,26 +2,26 @@ prepare:
 	apt-get -y install libarchive-extract-perl libhttp-server-brick-perl libgetopt-long-descriptive-perl libconfig-simple-perl liblog-log4perl-perl libhtml-strip-perl libdata-dump-perl
 
 install:
-	mkdir -p /etc/tkctl
-	cp -fp tkctl.pl /usr/local/bin/tkctl
-	cp -fp tkctl.conf /etc/tkctl/tkctl.conf
-	cp -fp tksrv.pl /usr/local/sbin/tksrv
-	cp -fp tksrv.conf /etc/tkctl/tksrv.conf
-	cp -fp tksrv.service /etc/systemd/system/tksrv.service
+	mkdir -p /etc/buildctl
+	cp -fp buildctl.pl /usr/local/bin/buildctl
+	cp -fp buildctl.conf /etc/buildctl/buildctl.conf
+	cp -fp buildsrv.pl /usr/local/sbin/buildsrv
+	cp -fp buildsrv.conf /etc/buildctl/buildsrv.conf
+	cp -fp buildsrv.service /etc/systemd/system/buildsrv.service
 	systemctl daemon-reload
-	cp -fp tkctl.bash /etc/bash_completion.d/tkctl
-	cp -fpr apps /etc/tkctl/
+	cp -fp buildctl.bash /etc/bash_completion.d/buildctl
+	cp -fpr apps /etc/buildctl/
 
 
 update:
-	-cp -fp tkctl.pl /usr/local/bin/tkctl
-	-cp -fp tkctl.conf /etc/tkctl/tkctl.conf
-	-cp -fp tksrv.pl /usr/local/sbin/tksrv
-	-cp -fp tksrv.conf /etc/tkctl/tksrv.conf
-	-cp -fp tksrv.service /etc/systemd/system/tksrv.service
+	-cp -fp buildctl.pl /usr/local/bin/buildctl
+	-cp -fp buildctl.conf /etc/buildctl/buildctl.conf
+	-cp -fp buildsrv.pl /usr/local/sbin/buildsrv
+	-cp -fp buildsrv.conf /etc/buildctl/buildsrv.conf
+	-cp -fp buildsrv.service /etc/systemd/system/buildsrv.service
 	-systemctl daemon-reload
-	-cp -fp tkctl.bash /etc/bash_completion.d/tkctl
-	-cp -fpr apps /etc/tkctl/
+	-cp -fp buildctl.bash /etc/bash_completion.d/buildctl
+	-cp -fpr apps /etc/buildctl/
 
 clean:
-	rm -rf /usr/local/bin/tkctl /etc/tkctl /usr/local/sbin/tksrv /etc/systemd/system/tksrv.service /etc/bash_completion.d/tkctl
+	rm -rf /usr/local/bin/buildctl /etc/buildctl /usr/local/sbin/buildsrv /etc/systemd/system/buildsrv.service /etc/bash_completion.d/buildctl
