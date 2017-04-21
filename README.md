@@ -39,3 +39,10 @@ And more help can be found with
 ```
 buildctl -h
 ```
+
+### Build file example
+You can use macros in app build files
+Specify a macro with
+```
+%<variable>
+```
