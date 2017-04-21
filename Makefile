@@ -14,6 +14,7 @@ install:
 
 
 update:
+	-git pull
 	-cp -fp buildctl.pl /usr/local/bin/buildctl
 	-cp -fp buildctl.conf /etc/buildctl/buildctl.conf
 	-cp -fp buildsrv.pl /usr/local/sbin/buildsrv
