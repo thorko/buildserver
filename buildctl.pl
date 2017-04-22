@@ -139,29 +139,50 @@ sub service_action {
 		  case "systemd" { 
                       # get available service
                       $unit = qx{/bin/systemctl list-unit-files |grep -E "$app.*service.*enabled"};
-                      if($unit eq "" or not defined($unit)) {
-					    print "ERROR: start-stop script couldn't be found\n";
-						print "Make sure the $app is enabled\n";
-                        $exit = 1;
-                      } else {
-                        $unit =~ s/.service.*enabled//g;
-                        chomp($unit);
-                        qx{/bin/systemctl $action $unit};
-                        $exit = $? >> 8;
-                      }
+                      my @units = split('\n', $unit);
+                      if (scalar(@units) < 1) {
+                        print "ERROR: start-stop script couldn't be found\n";
+                        exit(1);
+                      } 
+                      # foreach service run the action
+                      foreach (@units) {
+                          $_ =~ s/.service.*enabled//g;
+                          chomp($_);
+                          print "Will $action $_? (type uppercase yes): ";
+                          my $answer = <STDIN>;
+                          if($answer !~ /YES/) {
+                            # only do the action if user types YES
+                            print "will not do anything\n";
+                            next;
+                          } else {
+                            qx{/bin/systemctl $action $_};
+                            $exit = $? >> 8;
+                          }
+                      } 
                     }
 		  case "initd"   {  
                       # get available init files
                       $unit = qx{find /etc/init.d/ -executable | grep $app};
-                      if($unit eq "" or not defined($unit)) {
-					    print "ERROR: start-stop script couldn't be found\n";
-                        $exit = 1;
-                      } else {
-                        chomp($unit);
-                        qx{$unit $action};
-                        $exit = $? >> 8;
-                      }
-		                 }
+                      my @units = split('\n', $unit);
+                      if (scalar(@units) < 1) {
+                        print "ERROR: start-stop script couldn't be found\n";
+                        exit(1);
+                      } 
+                      # foreach service run the action
+                      foreach (@units) {
+                          chomp($_);
+                          print "Will $action $_? (type uppercase yes): ";
+                          my $answer = <STDIN>;
+                          if($answer !~ /YES/) {
+                            # only do the action if user types YES
+                            print "will not do anything\n";
+                            next;
+                          } else {
+                            qx{$_ $action};
+                            $exit = $? >> 8;
+                          }
+                      } 
+		            }
 	   }
 	   if($exit != 0) {
 		   print "ERROR: $unit couldn't $action $app\n";
