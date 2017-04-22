@@ -133,7 +133,7 @@ sub service_action {
    my $app = shift;
    my $action = shift;
    if ( defined($cc->{'init_sysv'}) and $cc->{'init_sysv'} ne "") {
-	   my $exit = 0;
+	 my $exit = 0;
      my $unit = "";
      switch ($cc->{'init_sysv'}) {
 		  case "systemd" { 
@@ -156,7 +156,11 @@ sub service_action {
                             next;
                           } else {
                             qx{/bin/systemctl $action $_};
-                            $exit = $? >> 8;
+							if($? != 0) {
+								print "ERROR: $_ couldn't $action\n";
+							} else {
+								print "$_ $action: [OK]\n";
+							}
                           }
                       } 
                     }
@@ -179,15 +183,14 @@ sub service_action {
                             next;
                           } else {
                             qx{$_ $action};
-                            $exit = $? >> 8;
+							if($? != 0) {
+								print "ERROR: $_ couldn't $action\n";
+							} else {
+								print "$_ $action: [OK]\n";
+							}
                           }
                       } 
 		            }
-	   }
-	   if($exit != 0) {
-		   print "ERROR: $unit couldn't $action $app\n";
-	   } else {
-		   print "$unit $action: [OK]\n";
 	   }
    }
 }
