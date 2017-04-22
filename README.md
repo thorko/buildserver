@@ -1,6 +1,11 @@
 BUILDCTL
 ========
 
+# Requirements
+```
+- debian
+- perl
+```
 
 # Install
 To install the software do
