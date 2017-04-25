@@ -3,8 +3,16 @@ BUILDCTL
 
 # Requirements
 ```
-- debian
 - perl
+  - Archive-Extract
+  - HTTP-Server-Brick
+  - GetOpt-Long-Descriptive
+  - Config-Simple
+  - Log-Log4perl
+  - HTML-Strip
+  - Data-Dump
+
+- Supports: Debian, CentOS, RedHat, Fedora
 ```
 
 # Install
