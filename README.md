@@ -77,3 +77,33 @@ postbuild_command="ln -s something"
 keep_build=false
 ```
 To get more info about the parameters check build_example.conf
+
+### Repository Server
+to start repository server use the configuration file at **/etc/buildctl/buildsrv.conf**
+```
+[log]
+loglevel=INFO
+logfile=/var/log/buildsrv.log
+
+[config]
+hostname=<your ip or hostname>
+port=8080
+path=/var/repository
+```
+Start it with
+```
+systemctl start buildsrv
+```
+
+### Install software from repository server
+```
+buildctl -a bind -v 9.10.4-P6 -r install
+```
+This will download the package from the repository server and install it to 
+the **install_path** setting in **/etc/buildctl/buildctl.conf**
+
+Afterwards you can switch to it
+```
+buildctl -a bind -r list-versions
+buildctl -a bind -v 9.10.4-P6 -r switch-version
+```
