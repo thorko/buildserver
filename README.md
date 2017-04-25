@@ -107,6 +107,11 @@ systemctl start buildsrv
 ```
 
 ### Install software from repository server
+Show what is available
+```
+buildctl -r repository         # list all available apps
+buildctl -r repository -a bind # list all packages of bind
+```
 ```
 buildctl -a bind -v 9.10.4-P6 -r install
 ```
