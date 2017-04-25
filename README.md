@@ -78,6 +78,17 @@ keep_build=false
 ```
 To get more info about the parameters check build_example.conf
 
+### Build your package
+To build your software run
+```
+buildctl -r build -b <your build file>
+```
+When done successful you can create the package with
+```
+buildctl -r pack -a bind -v 9.10.4-P6 -p /var/repository/bind
+```
+This will create an Tar/GZ-File in /var/repository/bind
+
 ### Repository Server
 to start repository server use the configuration file at **/etc/buildctl/buildsrv.conf**
 ```
