@@ -25,6 +25,10 @@ _buildctl() {
           COMPREPLY=( $(compgen -W '$APPS' -- $cur) );
           return 0;
           ;;
+		"-b")
+		  COMPREPLY=( $(compgen -W "$(ls .)" -- $cur) );
+		  return 0;
+		  ;;
    esac
 }
 
