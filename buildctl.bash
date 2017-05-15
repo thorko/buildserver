@@ -25,16 +25,20 @@ _buildctl() {
           COMPREPLY=( $(compgen -W '$APPS' -- $cur) );
           return 0;
           ;;
-		"-b")
-		  COMPREPLY=( $(compgen -W "$(ls .)" -- $cur) );
-		  return 0;
-		  ;;
+        "-v")
+          selected=${COMP_WORDS[COMP_CWORD-2]}
+          COMPREPLY=( $(compgen -W '$(ls --color=never /usr/local/$selected/ | grep -v current)' -- $cur) );
+          ;;
+        "-b")
+	      COMPREPLY=( $(compgen -W "$(ls .)" -- $cur) );
+	      return 0;
+	      ;;
         "-p")
-		  _filedir
-		  return 0;
+	      _filedir;
+	      return 0;
           ;;
         "--path")
-          _filedir
+          _filedir;
           return 0
           ;;
    esac
