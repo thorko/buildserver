@@ -30,7 +30,7 @@ _buildctl() {
           COMPREPLY=( $(compgen -W '$(ls --color=never /usr/local/$selected/ | grep -v current)' -- $cur) );
           ;;
         "-b")
-	      COMPREPLY=( $(compgen -W "$(ls .)" -- $cur) );
+	      _filedir;
 	      return 0;
 	      ;;
         "-p")
