@@ -29,14 +29,14 @@ _buildctl() {
 		  COMPREPLY=( $(compgen -W "$(ls .)" -- $cur) );
 		  return 0;
 		  ;;
-		"-p")
-		  COMPREPLY=( $(compgen -W "$(ls .)" -- $cur) );
+        "-p")
+		  _filedir
 		  return 0;
-		  ;;
-		"--path")
-		  COMPREPLY=( $(compgen -W "$(ls .)" -- $cur) );
-		  return 0;
-		  ;;
+          ;;
+        "--path")
+          _filedir
+          return 0
+          ;;
    esac
 }
 
