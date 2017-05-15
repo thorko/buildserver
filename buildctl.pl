@@ -141,8 +141,16 @@ sub service_action {
                       $unit = qx{/bin/systemctl list-unit-files |grep -E "$app.*service.*enabled"};
                       my @units = split('\n', $unit);
                       if (scalar(@units) < 1) {
-                        print "ERROR: start-stop script couldn't be found\n";
-                        exit(1);
+					    if($cc->{'restart'} eq "soft") {
+							print "WARN: start-stop script couldn't be found\n";
+							return 0;
+						} elsif ($cc->{'restart'} eq "hard") {
+                            print "ERROR: start-stop script couldn't be found\n";
+                            exit(1);
+						} else {
+							# ignore init file
+							return 0;
+						}
                       } 
                       # foreach service run the action
                       foreach (@units) {
@@ -169,8 +177,16 @@ sub service_action {
                       $unit = qx{find /etc/init.d/ -executable | grep $app};
                       my @units = split('\n', $unit);
                       if (scalar(@units) < 1) {
-                        print "ERROR: start-stop script couldn't be found\n";
-                        exit(1);
+					    if($cc->{'restart'} eq "soft") {
+							print "WARN: start-stop script couldn't be found\n";
+							return 0;
+						} elsif ($cc->{'restart'} eq "hard") {
+                            print "ERROR: start-stop script couldn't be found\n";
+                            exit(1);
+						} else {
+							# ignore init file
+							return 0;
+						}
                       } 
                       # foreach service run the action
                       foreach (@units) {
