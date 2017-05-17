@@ -19,9 +19,9 @@ sub new {
 	my $cfg = new Config::Simple();
 	my $log = $cfg->get_block("log");
 
-    $log->{'loglevel'} = "DEBUG" if ($debug);
-    my $log_conf;
-    if ( $debug ) {
+  $log->{'loglevel'} = "DEBUG" if ($debug);
+  my $log_conf;
+  if ( $debug ) {
     $log_conf = "
     log4perl.rootLogger=$log->{'loglevel'}, screen, Logfile
     log4perl.appender.screen = Log::Log4perl::Appender::Screen
@@ -33,16 +33,15 @@ sub new {
     log4perl.appender.Logfile.filename=$log->{'logfile'}
     log4perl.appender.Logfile.mode=append
     log4perl.appender.Logfile.layout=PatternLayout
-    log4perl.appender.Logfile.layout.ConversionPattern=%d %-5p %c - %m%n
-";
-    } else {
+    log4perl.appender.Logfile.layout.ConversionPattern=%d %-5p %c - %m%n";
+  } else {
     $log_conf = "log4perl.rootLogger=$log->{'loglevel'}, Logfile
     log4perl.appender.Logfile=Log::Log4perl::Appender::File
     log4perl.appender.Logfile.filename=$log->{'logfile'}
     log4perl.appender.Logfile.mode=append
     log4perl.appender.Logfile.layout=PatternLayout
-    log4perl.appender.Logfile.layout.ConversionPattern=%d %-5p %c - %m%n
-";
+    log4perl.appender.Logfile.layout.ConversionPattern=%d %-5p %c - %m%n";
+  }
 
 
 	Log::Log4perl->init(\$log_conf);
@@ -55,18 +54,17 @@ sub new {
 		if($a->{$l} == 1) {
 			push @apps, $l;
 		}
-    }
+  }
 	$self->apps = \@apps;
 
 	return bless $self, $class;
 }
 
-
 sub list_versions {
     my $self = shift;
     my $app = shift;
     my $config = $self->config;
-	my $logger = $self->logger;
+	  my $logger = $self->logger;
     $logger->debug("list versions");
     if ( $app eq "" || $app eq "all") {
        foreach ($self->apps) {
