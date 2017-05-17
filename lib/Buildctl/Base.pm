@@ -5,15 +5,16 @@ use warnings;
 
 use Log::Log4perl;
 use Config::Simple;
+use Data::Dump qw(dd);
 
 our @EXPORT = qw( list_versions );
 
 sub new {
-	my ($class, $args) = @_;
+	my ($class, %args) = @_;
 	my $self;
 
-	my $config = $args->{config};
-	my $debug = $args->{debug} // 0;
+	my $config = $args{config};
+	my $debug = $args{debug} // 0;
 
 	my @apps;
 	my $cfg = new Config::Simple();
