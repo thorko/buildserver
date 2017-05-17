@@ -16,6 +16,7 @@ sub list_versions {
     my $self = shift;
     my $app = shift;
     my $cc = $self->config;
+	my $ll = $self->logger;
     $ll->debug("list versions");
     if ( $app eq "" || $app eq "all") {
        foreach (@apps) {
