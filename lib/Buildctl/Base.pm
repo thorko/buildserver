@@ -18,6 +18,7 @@ sub new {
 
 	my @apps;
 	my $cfg = new Config::Simple();
+  $cfg->read($config);
 	my $log = $cfg->get_block("log");
 
   $log->{'loglevel'} = "DEBUG" if ($debug);
@@ -46,8 +47,8 @@ sub new {
 
 
 	Log::Log4perl->init(\$log_conf);
-	$self->logger = Log::Log4perl->get_logger();
-	$self->config = $cfg->get_block("config");
+	$self->{logger} = Log::Log4perl->get_logger();
+	$self->{config} = $cfg->get_block("config");
 
 	# read apps
 	my $a = $cfg->get_block("apps");
@@ -56,7 +57,7 @@ sub new {
 			push @apps, $l;
 		}
   }
-	$self->apps = \@apps;
+	$self->{apps} = \@apps;
 
 	return bless $self, $class;
 }
@@ -64,11 +65,11 @@ sub new {
 sub list_versions {
     my $self = shift;
     my $app = shift;
-    my $config = $self->config;
-	  my $logger = $self->logger;
+    my $config = $self->{config};
+	  my $logger = $self->{logger};
     $logger->debug("list versions");
     if ( $app eq "" || $app eq "all") {
-       foreach ($self->apps) {
+       foreach ($self->{apps}) {
             if ( ! -d "$config->{'install_path'}/$_" ) {
                 print "$config->{'install_path'}/$_ does not exist.\n";
             } else {
