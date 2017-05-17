@@ -68,8 +68,8 @@ sub list_versions {
     my $config = $self->{config};
 	  my $logger = $self->{logger};
     $logger->debug("list versions");
-    if ( $app eq "" || $app eq "all") {
-       foreach ($self->{apps}) {
+    if ( !defined($app) ||  $app eq "" || $app eq "all") {
+       foreach (@{$self->{apps}}) {
             if ( ! -d "$config->{'install_path'}/$_" ) {
                 print "$config->{'install_path'}/$_ does not exist.\n";
             } else {
