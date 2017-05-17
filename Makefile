@@ -37,4 +37,4 @@ update:
 	-cp -fpr apps /etc/buildctl/
 
 clean:
-	rm -rf /usr/local/bin/buildctl /etc/buildctl /usr/local/sbin/buildsrv /etc/systemd/system/buildsrv.service /etc/bash_completion.d/buildctl /usr/share/perl/Buildctl
+	rm -rf /usr/local/bin/buildctl /etc/buildctl /usr/local/sbin/buildsrv /etc/systemd/system/buildsrv.service /etc/bash_completion.d/buildctl /usr/share/perl5/Buildctl
