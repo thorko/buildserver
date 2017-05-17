@@ -5,6 +5,7 @@ use warnings;
 
 use Log::Log4perl;
 use Config::Simple;
+use Switch;
 use Data::Dump qw(dd);
 
 our @EXPORT = qw( list_versions );
@@ -93,5 +94,93 @@ sub list_versions {
        print "\n";
    }
 }
+
+# function to start or stop a service
+sub service_action {
+   my $self = shift;
+   my $app = shift;
+   my $action = shift;
+   my $config = $self->{config};
+   my $logger = $self->{logger};
+
+   if ( defined($config->{'init_sysv'}) and $config->{'init_sysv'} ne "") {
+	 my $exit = 0;
+     my $unit = "";
+     switch ($config->{'init_sysv'}) {
+		  case "systemd" { 
+                      # get available service
+                      $unit = qx{/bin/systemctl list-unit-files |grep -E "$app.*service.*enabled"};
+                      my @units = split('\n', $unit);
+                      if (scalar(@units) < 1) {
+					    if($config->{'restart'} eq "soft") {
+							print "WARN: start-stop script couldn't be found\n";
+							return 0;
+						} elsif ($config->{'restart'} eq "hard") {
+                            print "ERROR: start-stop script couldn't be found\n";
+                            exit(1);
+						} else {
+							# ignore init file
+							return 0;
+						}
+                      } 
+                      # foreach service run the action
+                      foreach (@units) {
+                          $_ =~ s/.service.*enabled//g;
+                          chomp($_);
+                          print "Will $action $_? (type uppercase yes): ";
+                          my $answer = <STDIN>;
+                          if($answer !~ /YES/) {
+                            # only do the action if user types YES
+                            print "will not do anything\n";
+                            next;
+                          } else {
+                            qx{/bin/systemctl $action $_};
+							if($? != 0) {
+								print "ERROR: $_ couldn't $action\n";
+							} else {
+								print "$_ $action: [OK]\n";
+							}
+                          }
+                      } 
+                    }
+		  case "initd"   {  
+                      # get available init files
+                      $unit = qx{find /etc/init.d/ -executable | grep $app};
+                      my @units = split('\n', $unit);
+                      if (scalar(@units) < 1) {
+					    if($config->{'restart'} eq "soft") {
+							print "WARN: start-stop script couldn't be found\n";
+							return 0;
+						} elsif ($config->{'restart'} eq "hard") {
+                            print "ERROR: start-stop script couldn't be found\n";
+                            exit(1);
+						} else {
+							# ignore init file
+							return 0;
+						}
+                      } 
+                      # foreach service run the action
+                      foreach (@units) {
+                          chomp($_);
+                          print "Will $action $_? (type uppercase yes): ";
+                          my $answer = <STDIN>;
+                          if($answer !~ /YES/) {
+                            # only do the action if user types YES
+                            print "will not do anything\n";
+                            next;
+                          } else {
+                            qx{$_ $action};
+							if($? != 0) {
+								print "ERROR: $_ couldn't $action\n";
+							} else {
+								print "$_ $action: [OK]\n";
+							}
+                          }
+                      } 
+		            }
+	   }
+   }
+}
+
 
 1;
