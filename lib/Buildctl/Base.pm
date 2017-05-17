@@ -10,9 +10,12 @@ our @EXPORT = qw( list_versions );
 
 sub new {
 	my ($class, $args) = @_;
+	my $self;
 
 	my $config = $args->{config};
-	my $debug = $args->{debug};
+	my $debug = $args->{debug} // 0;
+
+	my @apps;
 	my $cfg = new Config::Simple();
 	my $log = $cfg->get_block("log");
 
@@ -44,6 +47,16 @@ sub new {
 
 	Log::Log4perl->init(\$log_conf);
 	$self->logger = Log::Log4perl->get_logger();
+	$self->config = $cfg->get_block("config");
+
+	# read apps
+	my $a = $cfg->get_block("apps");
+	foreach my $l (keys %$a) {
+		if($a->{$l} == 1) {
+			push @apps, $l;
+		}
+    }
+	$self->apps = \@apps;
 
 	return bless $self, $class;
 }
@@ -52,15 +65,15 @@ sub new {
 sub list_versions {
     my $self = shift;
     my $app = shift;
-    my $cc = $self->config;
-	my $ll = $self->logger;
-    $ll->debug("list versions");
+    my $config = $self->config;
+	my $logger = $self->logger;
+    $logger->debug("list versions");
     if ( $app eq "" || $app eq "all") {
-       foreach (@apps) {
-            if ( ! -d "$cc->{'install_path'}/$_" ) {
-                print "$cc->{'install_path'}/$_ does not exist.\n";
+       foreach ($self->apps) {
+            if ( ! -d "$config->{'install_path'}/$_" ) {
+                print "$config->{'install_path'}/$_ does not exist.\n";
             } else {
-                my @v = glob "$cc->{'install_path'}/$_/[0-9].*";
+                my @v = glob "$config->{'install_path'}/$_/[0-9].*";
                 print "$_: ";
                 foreach (@v) {
                     $_ =~ s{.*/}{};
@@ -70,8 +83,8 @@ sub list_versions {
             }
        }
     } else {
-       $ll->debug("list version of $app");
-       my @v = glob "$cc->{'install_path'}/$app/[0-9].*";
+       $logger->debug("list version of $app");
+       my @v = glob "$config->{'install_path'}/$app/[0-9].*";
        print "$app: ";
        foreach (@v) {
             $_ =~ s{.*/}{};

@@ -10,7 +10,7 @@ use Data::Dump qw(dd);
 use Config::Simple;
 use HTML::Strip;
 use LWP::UserAgent;
-#use Buildctl::Base;
+use Buildctl::Base;
 use POSIX qw(strftime);
 use Switch;
 my $help = 0;
