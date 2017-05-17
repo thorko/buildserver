@@ -3,12 +3,49 @@ package Buildctl::Base;
 use strict;
 use warnings;
 
+use Log::Log4perl;
+use Config::Simple;
+
+our @EXPORT = qw( list_versions );
 
 sub new {
-	my $pkg = shift;
-	my $self = bless {}, $pkg;
+	my ($class, $args) = @_;
 
-	return $self;
+	my $config = $args->{config};
+	my $debug = $args->{debug};
+	my $cfg = new Config::Simple();
+	my $log = $cfg->get_block("log");
+
+    $log->{'loglevel'} = "DEBUG" if ($debug);
+    my $log_conf;
+    if ( $debug ) {
+    $log_conf = "
+    log4perl.rootLogger=$log->{'loglevel'}, screen, Logfile
+    log4perl.appender.screen = Log::Log4perl::Appender::Screen
+    log4perl.appender.screen.stderr = 0
+    log4perl.appender.screen.layout = PatternLayout
+    log4perl.appender.screen.layout.ConversionPattern = %d %p> %F{1}:%L %M - %m%n
+
+    log4perl.appender.Logfile=Log::Log4perl::Appender::File
+    log4perl.appender.Logfile.filename=$log->{'logfile'}
+    log4perl.appender.Logfile.mode=append
+    log4perl.appender.Logfile.layout=PatternLayout
+    log4perl.appender.Logfile.layout.ConversionPattern=%d %-5p %c - %m%n
+";
+    } else {
+    $log_conf = "log4perl.rootLogger=$log->{'loglevel'}, Logfile
+    log4perl.appender.Logfile=Log::Log4perl::Appender::File
+    log4perl.appender.Logfile.filename=$log->{'logfile'}
+    log4perl.appender.Logfile.mode=append
+    log4perl.appender.Logfile.layout=PatternLayout
+    log4perl.appender.Logfile.layout.ConversionPattern=%d %-5p %c - %m%n
+";
+
+
+	Log::Log4perl->init(\$log_conf);
+	$self->logger = Log::Log4perl->get_logger();
+
+	return bless $self, $class;
 }
 
 
