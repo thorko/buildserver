@@ -13,6 +13,7 @@ endif
 
 install:
 	mkdir -p /etc/buildctl
+	cp -fpr lib/Buildctl /usr/share/perl/
 	cp -fp buildctl.pl /usr/local/bin/buildctl
 	cp -fp buildctl.conf /etc/buildctl/buildctl.conf
 	cp -fp buildsrv.pl /usr/local/sbin/buildsrv
@@ -25,6 +26,7 @@ install:
 
 update:
 	-git pull
+	-cp -fpr lib/Buildctl /usr/share/perl/
 	-cp -fp buildctl.pl /usr/local/bin/buildctl
 	-cp -fp buildctl.conf /etc/buildctl/buildctl.conf
 	-cp -fp buildsrv.pl /usr/local/sbin/buildsrv
@@ -35,4 +37,4 @@ update:
 	-cp -fpr apps /etc/buildctl/
 
 clean:
-	rm -rf /usr/local/bin/buildctl /etc/buildctl /usr/local/sbin/buildsrv /etc/systemd/system/buildsrv.service /etc/bash_completion.d/buildctl
+	rm -rf /usr/local/bin/buildctl /etc/buildctl /usr/local/sbin/buildsrv /etc/systemd/system/buildsrv.service /etc/bash_completion.d/buildctl /usr/share/perl/Buildctl
