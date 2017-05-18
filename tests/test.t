@@ -3,6 +3,7 @@
 
 use lib 'lib';
 use Buildctl::Base;
+use Config::Simple;
 use Test::More;
 use FindBin qw($Bin);
 use strict;
@@ -53,4 +54,11 @@ qx{rm -f /tmp/apache2-1.2.1.tar.gz};
 my $hash = { install_path => '/usr/local/%app/%version', app => 'bind', version => '9.10.4-P8'};
 my $b = Buildctl::Base->new(config => $config, debug => 0);
 is($b->rep_var('/usr/local/%app/%version', $hash), '/usr/local/bind/9.10.4-P8', 'test path variable expansion');
+# test app config file expansion
+my $c = new Config::Simple();
+$c->read("tests/apache.conf");
+my $buildhash = $c->get_block("config");
+
+is($b->rep_var($buildhash->{'install_path'}, $buildhash), '/usr/local/apache2/2.4.25', 'test build file expansion 1');
+is($b->rep_var($buildhash->{'url'}, $buildhash), 'http://mirror.23media.de/apache//httpd/httpd-2.4.25.tar.gz', 'test build file expansion 2');
 done_testing();
