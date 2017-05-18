@@ -10,7 +10,7 @@ use LWP::UserAgent;
 use Switch;
 use Data::Dump qw(dd);
 
-our @EXPORT = qw( list_versions service_action switch_version get_active repository install delete );
+our @EXPORT = qw( list_versions service_action switch_version get_active repository install delete pack );
 
 sub new {
 	my ($class, %args) = @_;
