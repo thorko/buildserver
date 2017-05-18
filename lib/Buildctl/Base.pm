@@ -8,7 +8,7 @@ use Config::Simple;
 use Switch;
 use Data::Dump qw(dd);
 
-our @EXPORT = qw( list_versions );
+our @EXPORT = qw( list_versions service_action switch_version get_active );
 
 sub new {
 	my ($class, %args) = @_;

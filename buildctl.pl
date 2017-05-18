@@ -43,6 +43,9 @@ pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } 
 
 $config = defined($config) && $config ne "" ? $config : "/etc/buildctl/buildctl.conf";
 
+# use module
+my $buildctl = Buildctl::Base->new(config => $config, debug => $debug);
+
 my $cfg = new Config::Simple();
 $cfg->read($config);
 my $log = $cfg->get_block("log");
@@ -88,8 +91,8 @@ our $ll = Log::Log4perl->get_logger();
 
 my $exit = 0;
 switch ($command) {
-	case "list-versions" { &list_versions($app) }
-	case "get-active" { &get_active($app) }
+	case "list-versions" { $buildctl->list_versions($app) }
+	case "get-active" { $buildctl->get_active($app) }
 	case "switch-version" { &switch_version($app, $version) }
 	case "repository" { &repository($app) }
 	case "install" { &install($app, $version) }
@@ -99,35 +102,6 @@ switch ($command) {
 	else { pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  }
 }
 
-
-sub list_versions {
-	my $app = shift;
-	$ll->debug("list versions");
-	if ( $app eq "" || $app eq "all") {
-	   foreach (@apps) {
-			if ( ! -d "$cc->{'install_path'}/$_" ) {
-				print "$cc->{'install_path'}/$_ does not exist.\n";
-			} else {
-				my @v = glob "$cc->{'install_path'}/$_/[0-9].*";
-				print "$_: ";
-				foreach (@v) {
-					$_ =~ s{.*/}{};
-					print " $_ ";
-			    }
-				print "\n";
-			}
-	   }
-	} else {
-	   $ll->debug("list version of $app");
-	   my @v = glob "$cc->{'install_path'}/$app/[0-9].*";
-	   print "$app: ";
-	   foreach (@v) {
-			$_ =~ s{.*/}{};
-			print " $_ ";
-	   }
-	   print "\n";
-   }	
-}
 
 # function to start or stop a service
 sub service_action {
@@ -238,30 +212,6 @@ sub switch_version {
 	 # start service again
 	 service_action($app, "start");
    }
-}
-
-sub get_active {
-	my $app = shift;
-	if ( $app eq "" || $app eq "all") {
-	   foreach (@apps) {
-			if(-l "$cc->{'install_path'}/$_/current") {
-			  my $v = readlink("$cc->{'install_path'}/$_/current");
-			  $v =~ s{.*/}{};
-			  print "$_: $v\n" if ($v =~ /^\d+/);
-         	} else {
-				$ll->debug("$_: current link does not exist");
-			}
-	   }
-	} else {
-		if(-l "$cc->{'install_path'}/$app/current") {
-		  my $v = readlink("$cc->{'install_path'}/$app/current");
-		  $v =~ s{.*/}{};
-		  print "$app: $v\n" if ($v =~ /^\d+/);
-        } else {
-		  $ll->debug("$app: current link does not exist");
-        }
-	}
-
 }
 
 sub repository {
