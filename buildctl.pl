@@ -321,59 +321,6 @@ sub rep_var{
   return($var);
 }
 
-
-####################
-# build_script
-####################
-sub build_script {
-  my $bb = shift;
-  my $build_path = shift;
-  if ( ! -f $bb->{'build_script'} ) {
-	  print "ERROR: the build script $bb->{'build_script'} does not exist\n";
-	  return 1;
-  } 
-
-  # expand build script with macros
-  open(FILE, "<$bb->{'build_script'}");
-  my @lines = <FILE>;
-  close(FILE);
-  $bb->{'build_script'} =~ m{.*/(.*)};
-  my $script = $1;
-  $ll->debug("Create build script $build_path/$script");
-  open(NEW_FILE, ">$build_path/$script") or die "can't create build_script";
-  foreach(@lines) {
-    while($_ =~ /%([a-z_]+)/g) {
-      if(not defined($1)) {
-        print NEW_FILE $_;
-      } else {
-        $ll->debug("expand macro %$1");
-        my $p = $bb->{$1};
-        if(not defined($p)) {
-          $ll->info("%$1 macro does not exist in config file");
-          print "%$1 macro does not exist in config file\n";
-        } else {
-          $_ =~ s/%$1/$p/;
-        }
-      }
-    }
-    print NEW_FILE $_;
-  }
-  close(NEW_FILE);
-  qx{chmod +x $build_path/$script};
-  # run build script
-  print "Run your build script $build_path/$script: ";
-  qx{$build_path/$script > $build_path/build.log 2>&1};
-  my $exit = $? >> 8;
-  if($exit != 0) {
-    print "ERROR: check your build script and log $build_path/build.log\n";
-    exit 1;
-  } else {
-    print "OK\n";
-    exit 0;
-    return 0;
-  }
-}
-
 sub pre_post_action {
   my $command = shift;
   my $type = shift;
@@ -442,7 +389,7 @@ sub build {
 
   # check if build_script exists and call a different function
   if(defined($bb->{'build_script'})) {
-    build_script($bb, $build_path);
+    $buildctl->build_script($bb, $build_path);
   } else {
     # download source
     download($bb->{'url'}, $tmpfile);
