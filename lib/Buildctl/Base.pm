@@ -371,7 +371,7 @@ sub pack {
   }
 
   print "Packaging $app $version: ";
-  qx{tar -czf $path/$app-$version.tar.gz $config->{'install_path'}/$app/$version > /dev/null 2>&1};
+  qx{tar -czf $path/$app-$version.tar.gz -C $config->{'install_path'}/$app/$version . > /dev/null 2>&1};
   my $rc = $? >> 8;
   if ($rc != 0 ) {
     $logger->error("packaging of $app $version failed");
