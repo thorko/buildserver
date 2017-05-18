@@ -38,3 +38,7 @@ update:
 
 clean:
 	rm -rf /usr/local/bin/buildctl /etc/buildctl /usr/local/sbin/buildsrv /etc/systemd/system/buildsrv.service /etc/bash_completion.d/buildctl /usr/share/perl5/Buildctl
+
+test:
+	perl -Mlib=./lib -wc buildctl.pl
+	perl tests/test.t
