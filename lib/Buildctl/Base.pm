@@ -10,7 +10,7 @@ use LWP::UserAgent;
 use Switch;
 use Data::Dump qw(dd);
 
-our @EXPORT = qw( list_versions service_action switch_version get_active repository install delete pack );
+our @EXPORT = qw( list_versions service_action switch_version get_active repository install delete pack rep_var );
 
 sub new {
 	my ($class, %args) = @_;
@@ -379,6 +379,34 @@ sub pack {
     exit 1;
   }
   print "OK\n";
+}
+
+# function to expand macros in variable
+# will take variable and a hash which contains 
+# the macros values
+# return: var - with expanded macros
+sub rep_var{
+  my $self = shift;
+  my $var = shift;
+  my $cfghash = shift;
+  my $logger = $self->{logger};
+  my $a = "";
+
+  while($var =~ /%([a-z_]+)/g) {
+    # if $var doesn't contain any variable prefix
+    if(not defined($1)) {
+      return($var);
+    } else {
+      my $a = $cfghash->{$1};
+      if(not defined($a)) {
+        $logger->info("%$1 macro does not exist in config file");
+        print "%$1 macro does not exist in config file\n";
+      } else {
+        $var =~ s/%$1/$a/;
+      }
+    }
+  }
+  return($var);
 }
 
 1;
