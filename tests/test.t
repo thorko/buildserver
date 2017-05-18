@@ -16,4 +16,7 @@ like(qx/$tool -h/, qr/list all versions of applications/, 'check help message');
 # list-versions
 like(qx/$tool -r list-versions/, qr/php5:  0.0.1  0.0.2/, 'list application versions');
 
+# get-active
+like(qx/$tool -r get-active/, qr/apache2: 1.2.0/, 'get active version');
+
 done_testing();
