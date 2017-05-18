@@ -4,6 +4,7 @@
 use lib 'lib';
 use Buildctl::Base;
 use Config::Simple;
+use File::Grep qw(fgrep);
 use Test::More;
 use FindBin qw($Bin);
 use strict;
@@ -64,6 +65,9 @@ is($b->rep_var($buildhash->{'url'}, $buildhash), 'https://downloads.mariadb.org/
 
 # test build script expansion
 like(qx{$tool -r build -b tests/mariadb.conf}, qr{Run your build script /tmp/test_mariadb/mariadb.sh: ERROR: check your build script and log /tmp/test_mariadb/build.log}, 'create build script');
+my $scriptfile = "/tmp/test_mariadb/mariadb.sh";
+ok((fgrep { /https.*mariadb-5\.5\.56\.tar\.gz/ } $scriptfile) == 1, 'found version in url');
+ok((fgrep { /configure.*mariadb.5\.5\.56 --with/ } $scriptfile) == 1, 'found version in configure line');
 # clean up
 qx{rm -rf /tmp/test_mariadb};
 
