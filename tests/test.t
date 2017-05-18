@@ -73,7 +73,12 @@ qx{rm -rf /tmp/test_mariadb};
 
 # test build with app config file
 $pid = qx($srv > /dev/null 2>&1 & echo \$!);
-like(qx{$tool -r build -b tests/apache.conf}, qr{Will download http://127.0.0.1:8444/nginx/nginx-1.12.0.tar.gz: OK}, 'test build');
+my $build_output = qx{$tool -r build -b tests/apache.conf};
+like($build_output, qr{Will download http://127.0.0.1:8444/nginx/nginx-1.12.0.tar.gz: OK}, 'test download of build');
+like($build_output, qr{Extract archive /tmp/app.tgz to /tmp/apache2: OK}, 'test extract of downloaded source');
+like($build_output, qr{Configure: OK}, 'test configure of source');
+like($build_output, qr{Make: OK}, 'test make of source');
+like($build_output, qr{Install: OK}, 'test install of source');
 # cleanup
 qx(kill -HUP $pid);
 

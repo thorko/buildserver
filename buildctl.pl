@@ -103,133 +103,10 @@ switch ($command) {
 }
 
 
-# function to start or stop a service
-sub service_action {
-   my $app = shift;
-   my $action = shift;
-   if ( defined($cc->{'init_sysv'}) and $cc->{'init_sysv'} ne "") {
-	 my $exit = 0;
-     my $unit = "";
-     switch ($cc->{'init_sysv'}) {
-		  case "systemd" { 
-                      # get available service
-                      $unit = qx{/bin/systemctl list-unit-files |grep -E "$app.*service.*enabled"};
-                      my @units = split('\n', $unit);
-                      if (scalar(@units) < 1) {
-					    if($cc->{'restart'} eq "soft") {
-							print "WARN: start-stop script couldn't be found\n";
-							return 0;
-						} elsif ($cc->{'restart'} eq "hard") {
-                            print "ERROR: start-stop script couldn't be found\n";
-                            exit(1);
-						} else {
-							# ignore init file
-							return 0;
-						}
-                      } 
-                      # foreach service run the action
-                      foreach (@units) {
-                          $_ =~ s/.service.*enabled//g;
-                          chomp($_);
-                          print "Will $action $_? (type uppercase yes): ";
-                          my $answer = <STDIN>;
-                          if($answer !~ /YES/) {
-                            # only do the action if user types YES
-                            print "will not do anything\n";
-                            next;
-                          } else {
-                            qx{/bin/systemctl $action $_};
-							if($? != 0) {
-								print "ERROR: $_ couldn't $action\n";
-							} else {
-								print "$_ $action: [OK]\n";
-							}
-                          }
-                      } 
-                    }
-		  case "initd"   {  
-                      # get available init files
-                      $unit = qx{find /etc/init.d/ -executable | grep $app};
-                      my @units = split('\n', $unit);
-                      if (scalar(@units) < 1) {
-					    if($cc->{'restart'} eq "soft") {
-							print "WARN: start-stop script couldn't be found\n";
-							return 0;
-						} elsif ($cc->{'restart'} eq "hard") {
-                            print "ERROR: start-stop script couldn't be found\n";
-                            exit(1);
-						} else {
-							# ignore init file
-							return 0;
-						}
-                      } 
-                      # foreach service run the action
-                      foreach (@units) {
-                          chomp($_);
-                          print "Will $action $_? (type uppercase yes): ";
-                          my $answer = <STDIN>;
-                          if($answer !~ /YES/) {
-                            # only do the action if user types YES
-                            print "will not do anything\n";
-                            next;
-                          } else {
-                            qx{$_ $action};
-							if($? != 0) {
-								print "ERROR: $_ couldn't $action\n";
-							} else {
-								print "$_ $action: [OK]\n";
-							}
-                          }
-                      } 
-		            }
-	   }
-   }
-}
-
 ###########################################################################
 #  build section
 #  #######################################################################
 #
-sub download {
-  my $url = shift;
-  my $tmp = shift;
-  my $timeout = 60;
-  print "Will download $url: ";
-  qx{wget -O $tmp --timeout=$timeout --quiet --prefer-family=IPv4 $url};
-  my $exit = $? >> 8;
-  if($exit != 0) {
-    $ll->error("$url couldn't be downloaded.");
-    print "ERROR: $url couldn't be downloaded\n";
-    exit 1;
-  } else { 
-    print "OK\n";
-    return 0;
-  }
-}
-
-sub extract_source {
-  my $build_path = shift;
-  my $tmpfile = shift;
-  my $archive_type = shift;
-
-  # cleanup old stuff
-  qx{rm -rf $build_path};
-  qx{mkdir -p $build_path};
-  print "Extract archive $tmpfile to $build_path: ";
-
-  my $ae = Archive::Extract->new(archive => $tmpfile, type => $archive_type);
-  my $ok = $ae->extract(to => $build_path);
-  if ($ok) {
-     print "OK\n";
-     # get path of source
-     my @p = glob "$build_path/*";
-     $p[0] =~ s{.*/}{};
-     return $p[0];
-  } else {
-     print "ERROR: extracting file $tmpfile\n";
-     exit 1;
-   }
-}
 
 ##############
 # configure
@@ -394,7 +271,7 @@ sub build {
     # download source
     $buildctl->download($bb->{'url'}, $tmpfile);
     # extract source
-    my $source = extract_source($build_path, $tmpfile, $bb->{'archive_type'});
+    my $source = $buildctl->extract_source($build_path, $tmpfile, $bb->{'archive_type'});
     # run prebuild_command
     if(defined($bb->{'prebuild_command'}) && $bb->{'prebuild_command'} ne "" ){
       $bb->{'prebuild_command'} = rep_var($bb->{'prebuild_command'}, $bb);

@@ -570,6 +570,7 @@ sub check_install_dir {
 }
 
 sub extract_source {
+  my $self = shift;
   my $build_path = shift;
   my $tmpfile = shift;
   my $archive_type = shift;
