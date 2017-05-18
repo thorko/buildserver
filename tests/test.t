@@ -41,4 +41,8 @@ like(qx/$tool -r delete -a nginx -v 1.12.0/, qr/Success/, 'delete nginx');
 # cleanup
 qx(rm -rf tests/apps/nginx);
 qx(kill -HUP $pid);
+
+# pack an app
+like(qx/$tool -r pack -a apache2 -v 1.2.1 -p \/tmp\//, qr/Packaging apache2 1.2.1: OK/, 'pack app apache2');
+qx{rm -f /tmp/apache2-1.2.1.tar.gz};
 done_testing();

@@ -357,4 +357,28 @@ sub delete {
   }
 }
 
+sub pack {
+  my $self = shift;
+  my $app = shift;
+  my $version = shift;
+  my $path = shift;
+  my $config = $self->{config};
+  my $logger = $self->{logger};
+
+  if ($app eq "" || $version eq "" || $path eq "") {
+    print "some required option not set\n";
+    exit 0;
+  }
+
+  print "Packaging $app $version: ";
+  qx{tar -czf $path/$app-$version.tar.gz $config->{'install_path'}/$app/$version > /dev/null 2>&1};
+  my $rc = $? >> 8;
+  if ($rc != 0 ) {
+    $logger->error("packaging of $app $version failed");
+    print "ERROR: packaging of $app $version failed\n";
+    exit 1;
+  }
+  print "OK\n";
+}
+
 1;

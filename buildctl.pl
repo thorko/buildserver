@@ -98,7 +98,7 @@ switch ($command) {
 	case "install" { $buildctl->install($app, $version) }
 	case "delete" { $buildctl->delete($app, $version) }
 	case "build" { &build($build_file) }
-    case "pack" { &pack($app, $version, $path) }
+    case "pack" { $buildctl->pack($app, $version, $path) }
 	else { pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  }
 }
 
@@ -407,28 +407,6 @@ sub check_install_dir {
     # create install path
     qx{mkdir -p $id};
   }
-}
-
-sub pack {
-  my $app = shift;
-  my $version = shift;
-  my $path = shift;
-
-  if ($app eq "" || $version eq "" || $path eq "") {
-    print "some required option not set\n";
-    exit 0;
-  }
-
-  print "Packaging $app $version: ";
-  qx{tar -czf $path/$app-$version.tar.gz $cc->{'install_path'}/$app/$version > /dev/null 2>&1};
-  my $rc = $? >> 8;
-  if ($rc != 0 ) {
-    $ll->error("packaging of $app $version failed");
-    print "ERROR: packaging of $app $version failed\n";
-    exit 1;
-  }
-  print "OK\n";
-
 }
 
 ##############
