@@ -95,8 +95,8 @@ switch ($command) {
 	case "get-active" { $buildctl->get_active($app) }
 	case "switch-version" { $buildctl->switch_version($app, $version) }
 	case "repository" { $buildctl->repository($app) }
-	case "install" { &install($app, $version) }
-	case "delete" { &delete($app, $version) }
+	case "install" { $buildctl->install($app, $version) }
+	case "delete" { $buildctl->delete($app, $version) }
 	case "build" { &build($build_file) }
     case "pack" { &pack($app, $version, $path) }
 	else { pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  }
@@ -184,74 +184,6 @@ sub service_action {
 		            }
 	   }
    }
-}
-
-sub install {
-   my $app = shift;
-   my $version = shift;
-   my $req = "";
-   my $url = "";
-   my $raw = "";
-   my ($ua) = LWP::UserAgent->new;
-   if ($app eq "" || $version eq "") {
-     print "app or version not given.\n";
-     return 0;
-   } else {
-     $ll->info("download $app-$version.tar.gz");
-     $url = "http://$rep->{'server'}:$rep->{'port'}/$app/$app-$version.tar.gz";
-     print "download: $app-$version.tar.gz\n";
-     my $r = $ua->get($url, ':content_file' => "/tmp/$app-$version.tar.gz");
-     if($r->{'_rc'} != 200) {
-       $ll->error("$app-$version.tar.gz not available in repository");
-       print "ERROR: $app-$version.tar.gz not available in repository\n";
-       return 1;
-     }
-	 $ll->debug("result: $r");
-     $ll->info("installing $app-$version.tar.gz");
-     print "installing: $app-$version.tar.gz\n";
-     qx{tar -xzf /tmp/$app-$version.tar.gz -C /};
-     my $exit = $? >> 8;
-     if($exit != 0) {
-       $ll->error("Couldn't extract /tmp/$app-$version.tar.gz to /");
-       print "Couldn't extract file /tmp/$app-$version.tar.gz to /\n";
-       return 1;
-     } else {
-       $ll->info("Success");
-       print "Success\n";
-     } 
-     unlink("/tmp/$app-$version.tar.gz");
-   }
-}
-
-sub delete {
-	my $app = shift;
-	my $version = shift;
-	if($app eq "" || $version eq "") {
-		print "app or version not given.\n";
-		return 0;
-    }
-
-  my $active_version = readlink("$cc->{'install_path'}/$app/current");
-  $active_version =~ s{.*/(\d+.*)}{$1};
-  if ($active_version eq $version) {
-    $ll->error("$app: can't delete active version $version\n");
-    print "ERROR: $app: can't delete active version $version\n";
-    return 0;
-  } else {
-    $ll->info("$app will delete version $version\n");
-    print "$app: delete $version\n";
-        qx{rm -rf  $cc->{'install_path'}/$app/$version};
-        my $exit = $? >> 8;
-      if($exit != 0) {
-      $ll->error("$app: Couldn't delete $version");
-      print "ERROR: $app: Couldn't delete $version\n";
-      } else {
-      $ll->info("$app: Deleted old version $version");
-      print "Success\n";
-      }
-  }
-
-
 }
 
 ###########################################################################

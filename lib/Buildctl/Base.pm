@@ -10,7 +10,7 @@ use LWP::UserAgent;
 use Switch;
 use Data::Dump qw(dd);
 
-our @EXPORT = qw( list_versions service_action switch_version get_active repository );
+our @EXPORT = qw( list_versions service_action switch_version get_active repository install delete );
 
 sub new {
 	my ($class, %args) = @_;
@@ -277,6 +277,84 @@ sub repository {
         print "$_\n" if ($_ =~ /^$app.*/);
       }
    }
+}
+
+sub install {
+   my $self = shift;
+   my $app = shift;
+   my $version = shift;
+   my $config = $self->{config};
+   my $logger = $self->{logger};
+   my $rep = $self->{rep};
+   my $req = "";
+   my $url = "";
+   my $raw = "";
+   my ($ua) = LWP::UserAgent->new;
+   if ($app eq "" || $version eq "") {
+     print "app or version not given.\n";
+     return 0;
+   } else {
+     $logger->info("download $app-$version.tar.gz");
+     $url = "http://$rep->{'server'}:$rep->{'port'}/$app/$app-$version.tar.gz";
+     print "download: $app-$version.tar.gz\n";
+     my $r = $ua->get($url, ':content_file' => "/tmp/$app-$version.tar.gz");
+     if($r->{'_rc'} != 200) {
+       $logger->error("$app-$version.tar.gz not available in repository");
+       print "ERROR: $app-$version.tar.gz not available in repository\n";
+       return 1;
+     }
+	 $logger->debug("result: $r");
+     $logger->info("installing $app-$version.tar.gz");
+     print "installing: $app-$version.tar.gz\n";
+	 # make dest
+	 qx{mkdir -p $config->{'install_path'}/$app/$version};
+	 # extract app
+     qx{tar -xzf /tmp/$app-$version.tar.gz -C $config->{'install_path'}/$app/$version --strip-components=3};
+     my $exit = $? >> 8;
+     if($exit != 0) {
+       $logger->error("Couldn't extract /tmp/$app-$version.tar.gz to $config->{'install_path'}/$app/$version");
+       print "Couldn't extract file /tmp/$app-$version.tar.gz to $config->{'install_path'}/$app/$version \n";
+       return 1;
+     } else {
+       $logger->info("Success");
+       print "Success\n";
+     } 
+     unlink("/tmp/$app-$version.tar.gz");
+   }
+}
+
+sub delete {
+    my $self = shift;
+	my $app = shift;
+	my $version = shift;
+	my $config = $self->{config};
+	my $logger = $self->{logger};
+	if($app eq "" || $version eq "") {
+		print "app or version not given.\n";
+		return 0;
+    }
+
+  my $active_version = readlink("$config->{'install_path'}/$app/current");
+  if (defined($active_version)) {
+    $active_version =~ s{.*/(\d+.*)}{$1};
+  }
+  if (defined($active_version) and $active_version eq $version) {
+    $logger->error("$app: can't delete active version $version\n");
+    print "ERROR: $app: can't delete active version $version\n";
+    return 0;
+  } else {
+    $logger->info("$app will delete version $version\n");
+    print "$app: delete $version\n";
+        qx{rm -rf  $config->{'install_path'}/$app/$version};
+        my $exit = $? >> 8;
+      if($exit != 0) {
+      $logger->error("$app: Couldn't delete $version");
+      print "ERROR: $app: Couldn't delete $version\n";
+      } else {
+      $logger->info("$app: Deleted old version $version");
+      print "Success\n";
+      }
+  }
 }
 
 1;
