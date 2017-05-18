@@ -31,6 +31,11 @@ like(qx/$tool -r switch-version -a apache2 -v 1.2.0/, qr/WARN: start-stop script
 my $pid = qx($srv > /dev/null 2>&1 & echo \$!);
 like(qx/$tool -r repository -a nginx/, qr/nginx-1.12.0.tar.gz/, 'show repository');
 # stop repository server
-qx(kill -HUP $pid);
 
+# install nginx
+like(qx/$tool -r install -a nginx -v 1.12.0/, qr/Success/, 'install nginx');
+
+# cleanup
+qx(rm -rf tests/apps/nginx);
+qx(kill -HUP $pid);
 done_testing();
