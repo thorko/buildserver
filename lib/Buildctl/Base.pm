@@ -8,7 +8,7 @@ use Config::Simple;
 use HTML::Strip;
 use LWP::UserAgent;
 use Switch;
-use Data::Dump qw(dd);
+use Archive::Extract;
 
 our @EXPORT = qw( list_versions service_action switch_version get_active repository install delete pack rep_var build_script );
 
@@ -508,6 +508,89 @@ sub make {
     print "OK\n";
     return 0;
   }
+}
+
+##############
+# make install
+##############
+sub make_install {
+  my $self = shift;
+  my $build_path = shift;
+  my $source_dir = shift;
+  my $install_cmd = shift;
+  my $log = "install.log";
+  # run make
+  print "Install: ";
+  qx{cd $build_path/$source_dir && $install_cmd > $build_path/$log 2>&1};
+  my $exit = $? >> 8;
+  if ($exit != 0) {
+    print "ERROR: $install_cmd failed\nCheck $build_path/$log\n";
+    exit 1;
+  } else {
+    print "OK\n";
+    return 0;
+  }
+}
+
+sub pre_post_action {
+  my $self = shift;
+  my $command = shift;
+  my $type = shift;
+  my $build_path = shift;
+  my $logger = $self->{logger};
+
+  print "Running $type command: ";
+  qx{cd $build_path && $command > $build_path/$type.log 2>&1};
+  my $rc = $? >> 8;
+  if ($rc != 0 ) {
+    $logger->error("build command $command failed, check log $build_path/$type.log");
+    print "ERROR: build command $command failed, check log $build_path/$type.log\n";
+    exit 1;
+  }
+  print "OK\n";
+  return 0;
+}
+
+sub check_install_dir {
+  my $id = shift;
+  # don't install if version already exists
+  if ( -d $id ) {
+	  print "ERROR: $id already exists\n";
+	  print "Do you want to continue? (type uppercase yes): ";
+	  my $answer = <STDIN>;
+	  if($answer !~ /YES/) {
+	    exit 0;
+	  }
+  }
+  # check if install_path exists
+  if(! -d $id) {
+    # create install path
+    qx{mkdir -p $id};
+  }
+}
+
+sub extract_source {
+  my $build_path = shift;
+  my $tmpfile = shift;
+  my $archive_type = shift;
+
+  # cleanup old stuff
+  qx{rm -rf $build_path};
+  qx{mkdir -p $build_path};
+  print "Extract archive $tmpfile to $build_path: ";
+
+  my $ae = Archive::Extract->new(archive => $tmpfile, type => $archive_type);
+  my $ok = $ae->extract(to => $build_path);
+  if ($ok) {
+     print "OK\n";
+     # get path of source
+     my @p = glob "$build_path/*";
+     $p[0] =~ s{.*/}{};
+     return $p[0];
+  } else {
+     print "ERROR: extracting file $tmpfile\n";
+     exit 1;
+   }
 }
 
 1;
