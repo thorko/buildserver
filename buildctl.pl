@@ -94,7 +94,7 @@ switch ($command) {
 	case "list-versions" { $buildctl->list_versions($app) }
 	case "get-active" { $buildctl->get_active($app) }
 	case "switch-version" { $buildctl->switch_version($app, $version) }
-	case "repository" { &repository($app) }
+	case "repository" { $buildctl->repository($app) }
 	case "install" { &install($app, $version) }
 	case "delete" { &delete($app, $version) }
 	case "build" { &build($build_file) }
@@ -183,38 +183,6 @@ sub service_action {
                       } 
 		            }
 	   }
-   }
-}
-
-sub repository {
-   my $app = shift;
-   my $req = "";
-   my $url = "";
-   my $raw = "";
-   my ($ua) = LWP::UserAgent->new;
-   if ($app eq "") {
-      $url = "http://$rep->{'server'}:$rep->{'port'}";
-      $ll->debug("Call: $url");
-      $req = HTTP::Request->new(GET => $url);
-      $raw = $ua->request($req)->content;
-      my $hs = HTML::Strip->new();
-      my $text = $hs->parse($raw);
-      $hs->eof;
-      my $appl = "";
-      foreach (split("\n", $text)) {
-        print grep {/^([a-z0-9A-Z\-\.]*)\/$/ } $_ . "\n";
-      }
-   } else {
-      $url = "http://$rep->{'server'}:$rep->{'port'}/$app";
-      $ll->debug("Call: $url");
-      $req = HTTP::Request->new(GET => $url);
-      $raw = $ua->request($req)->content;
-      my $hs = HTML::Strip->new();
-      my $text = $hs->parse($raw);
-      $hs->eof;
-      foreach (split("\n", $text)) {
-        print "$_\n" if ($_ =~ /^$app.*/);
-      }
    }
 }
 

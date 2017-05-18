@@ -5,10 +5,12 @@ use warnings;
 
 use Log::Log4perl;
 use Config::Simple;
+use HTML::Strip;
+use LWP::UserAgent;
 use Switch;
 use Data::Dump qw(dd);
 
-our @EXPORT = qw( list_versions service_action switch_version get_active );
+our @EXPORT = qw( list_versions service_action switch_version get_active repository );
 
 sub new {
 	my ($class, %args) = @_;
@@ -19,7 +21,7 @@ sub new {
 
 	my @apps;
 	my $cfg = new Config::Simple();
-  $cfg->read($config);
+    $cfg->read($config);
 	my $log = $cfg->get_block("log");
 
   $log->{'loglevel'} = "DEBUG" if ($debug);
@@ -59,6 +61,8 @@ sub new {
 		}
   }
 	$self->{apps} = \@apps;
+
+	$self->{rep} = $cfg->get_block("repository");
 
 	return bless $self, $class;
 }
@@ -237,6 +241,42 @@ sub get_active {
 		  $logger->debug("$app: current link does not exist");
         }
 	}
+}
+
+sub repository {
+   my $self = shift;
+   my $app = shift;
+   my $config = $self->{config};
+   my $logger = $self->{logger};
+   my $rep    = $self->{rep};
+   my $req = "";
+   my $url = "";
+   my $raw = "";
+   my ($ua) = LWP::UserAgent->new;
+   if ($app eq "") {
+      $url = "http://$rep->{'server'}:$rep->{'port'}";
+      $logger->debug("Call: $url");
+      $req = HTTP::Request->new(GET => $url);
+      $raw = $ua->request($req)->content;
+      my $hs = HTML::Strip->new();
+      my $text = $hs->parse($raw);
+      $hs->eof;
+      my $appl = "";
+      foreach (split("\n", $text)) {
+        print grep {/^([a-z0-9A-Z\-\.]*)\/$/ } $_ . "\n";
+      }
+   } else {
+      $url = "http://$rep->{'server'}:$rep->{'port'}/$app";
+      $logger->debug("Call: $url");
+      $req = HTTP::Request->new(GET => $url);
+      $raw = $ua->request($req)->content;
+      my $hs = HTML::Strip->new();
+      my $text = $hs->parse($raw);
+      $hs->eof;
+      foreach (split("\n", $text)) {
+        print "$_\n" if ($_ =~ /^$app.*/);
+      }
+   }
 }
 
 1;
