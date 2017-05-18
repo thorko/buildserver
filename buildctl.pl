@@ -392,9 +392,9 @@ sub build {
     $buildctl->build_script($bb, $build_path);
   } else {
     # download source
-    download($bb->{'url'}, $tmpfile);
+    $buildctl->download($bb->{'url'}, $tmpfile);
     # extract source
-    my $source = $buildctl->extract_source($build_path, $tmpfile, $bb->{'archive_type'});
+    my $source = extract_source($build_path, $tmpfile, $bb->{'archive_type'});
     # run prebuild_command
     if(defined($bb->{'prebuild_command'}) && $bb->{'prebuild_command'} ne "" ){
       $bb->{'prebuild_command'} = rep_var($bb->{'prebuild_command'}, $bb);

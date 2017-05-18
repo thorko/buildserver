@@ -71,4 +71,10 @@ ok((fgrep { /configure.*mariadb.5\.5\.56 --with/ } $scriptfile) == 1, 'found ver
 # clean up
 qx{rm -rf /tmp/test_mariadb};
 
+# test build with app config file
+$pid = qx($srv > /dev/null 2>&1 & echo \$!);
+like(qx{$tool -r build -b tests/apache.conf}, qr{Will download http://127.0.0.1:8444/nginx/nginx-1.12.0.tar.gz: OK}, 'test build');
+# cleanup
+qx(kill -HUP $pid);
+
 done_testing();

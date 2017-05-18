@@ -593,4 +593,23 @@ sub extract_source {
    }
 }
 
+sub download {
+  my $self = shift;
+  my $url = shift;
+  my $tmp = shift;
+  my $logger = $self->{logger};
+  my $timeout = 60;
+  print "Will download $url: ";
+  qx{wget -O $tmp --timeout=$timeout --quiet --prefer-family=IPv4 $url};
+  my $exit = $? >> 8;
+  if($exit != 0) {
+    $logger->error("$url couldn't be downloaded.");
+    print "ERROR: $url couldn't be downloaded\n";
+    exit 1;
+  } else { 
+    print "OK\n";
+    return 0;
+  }
+}
+
 1;
