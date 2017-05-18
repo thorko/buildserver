@@ -465,4 +465,49 @@ sub build_script {
   }
 }
 
+##############
+# configure
+##############
+sub configure {
+  my $self = shift;
+  my $build_path = shift; 
+  my $source_dir = shift;
+  my $build_opts = shift;
+  my $log = "configure.log";
+
+  # run build
+  print "Configure: ";
+  qx{cd $build_path/$source_dir && $build_opts > $build_path/$log 2>&1};
+  my $exit = $? >> 8;
+  if ($exit != 0) {
+    print "ERROR: configure $build_opts failed\nCheck $build_path/$log\n";
+    exit 1;
+  } else {
+    print "OK\n";
+    return 0;
+  }
+}
+
+##############
+# make
+##############
+sub make {
+  my $self = shift;
+  my $build_path = shift;
+  my $source_dir = shift;
+  my $make_cmd = shift;
+  my $log = "make.log";
+  # run make
+  print "Make: ";
+  qx{cd $build_path/$source_dir && $make_cmd > $build_path/$log 2>&1};
+  my $exit = $? >> 8;
+  if ($exit != 0) {
+    print "ERROR: $make_cmd failed\nCheck $build_path/$log\n";
+    exit 1;
+  } else {
+    print "OK\n";
+    return 0;
+  }
+}
+
 1;
