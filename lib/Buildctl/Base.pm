@@ -182,5 +182,61 @@ sub service_action {
    }
 }
 
+sub switch_version {
+   my $self = shift;
+   my $app = shift;
+   my $version = shift;
+   my $config = $self->{config};
+   my $logger = $self->{logger};
+   if ($app eq "" || $version eq "") {
+     print "no app given or version\n";
+	 return;
+   } else {
+	 if ( ! -d "$config->{'install_path'}/$app/$version" ) {
+		print "ERROR: $app version $version not available\n";
+		return 0;
+	 }
+	 # stop service
+	 $self->service_action($app, "stop");
+     $logger->debug("$app: -> $version");
+	 qx{ln -sfn $config->{'install_path'}/$app/$version $config->{'install_path'}/$app/current};
+	 my $exit = $? >> 8;
+	 if($exit != 0) {
+		print "ERROR: $app couldn't switch to $version\n";
+		print "ln -sfn failed\n";
+		exit $exit;
+	 } else {
+		print "$app: switched to $version\n";
+	 }
+	 # start service again
+	 $self->service_action($app, "start");
+   }
+}
+
+sub get_active {
+    my $self = shift;
+	my $app = shift;
+	my $config = $self->{config};
+	my $logger = $self->{logger};
+	if ( $app eq "" || $app eq "all") {
+	   foreach (@{$self->{apps}}) {
+			if(-l "$config->{'install_path'}/$_/current") {
+			  my $v = readlink("$config->{'install_path'}/$_/current");
+			  $v =~ s{.*/}{};
+			  print "$_: $v\n" if ($v =~ /^\d+/);
+         	} else {
+				$logger->debug("$_: current link does not exist");
+			}
+	   }
+	} else {
+		if(-l "$config->{'install_path'}/$app/current") {
+		  my $v = readlink("$config->{'install_path'}/$app/current");
+		  $v =~ s{.*/}{};
+		  print "$app: $v\n" if ($v =~ /^\d+/);
+        } else {
+		  $logger->debug("$app: current link does not exist");
+        }
+	}
+}
 
 1;
