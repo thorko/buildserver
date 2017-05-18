@@ -93,7 +93,7 @@ my $exit = 0;
 switch ($command) {
 	case "list-versions" { $buildctl->list_versions($app) }
 	case "get-active" { $buildctl->get_active($app) }
-	case "switch-version" { &switch_version($app, $version) }
+	case "switch-version" { $buildctl->switch_version($app, $version) }
 	case "repository" { &repository($app) }
 	case "install" { &install($app, $version) }
 	case "delete" { &delete($app, $version) }
@@ -183,34 +183,6 @@ sub service_action {
                       } 
 		            }
 	   }
-   }
-}
-
-sub switch_version {
-   my $app = shift;
-   my $version = shift;
-   if ($app eq "" || $version eq "") {
-     print "no app given or version\n";
-	 return;
-   } else {
-	 if ( ! -d "$cc->{'install_path'}/$app/$version" ) {
-		print "ERROR: $app version $version not available\n";
-		return 0;
-	 }
-	 # stop service
-	 service_action($app, "stop");
-     $ll->debug("$app: -> $version");
-	 qx{ln -sfn $cc->{'install_path'}/$app/$version $cc->{'install_path'}/$app/current};
-	 my $exit = $? >> 8;
-	 if($exit != 0) {
-		print "ERROR: $app couldn't switch to $version\n";
-		print "ln -sfn failed\n";
-		exit $exit;
-	 } else {
-		print "$app: switched to $version\n";
-	 }
-	 # start service again
-	 service_action($app, "start");
    }
 }
 
