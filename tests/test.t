@@ -2,14 +2,16 @@
 
 
 use lib 'lib';
+use Buildctl::Base;
 use Test::More;
 use FindBin qw($Bin);
 use strict;
 use warnings;
 
 my $opt = "-Mlib=$Bin/../lib";
-my $config = "-c tests/buildctl.conf";
-my $tool = "$^X $opt $Bin/../buildctl.pl $config";
+my $config = "tests/buildctl.conf";
+my $cfgopt = "-c $config";
+my $tool = "$^X $opt $Bin/../buildctl.pl $cfgopt";
 
 my $srv = "$^X $opt $Bin/../buildsrv.pl -c tests/buildsrv.conf";
 
@@ -45,4 +47,10 @@ qx(kill -HUP $pid);
 # pack an app
 like(qx/$tool -r pack -a apache2 -v 1.2.1 -p \/tmp\//, qr/Packaging apache2 1.2.1: OK/, 'pack app apache2');
 qx{rm -f /tmp/apache2-1.2.1.tar.gz};
+
+
+# test rep_var
+my $hash = { install_path => '/usr/local/%app/%version', app => 'bind', version => '9.10.4-P8'};
+my $b = Buildctl::Base->new(config => $config, debug => 0);
+is($b->rep_var('/usr/local/%app/%version', $hash), '/usr/local/bind/9.10.4-P8', 'test path variable expansion');
 done_testing();

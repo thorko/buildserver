@@ -294,6 +294,10 @@ sub install {
      print "app or version not given.\n";
      return 0;
    } else {
+     if ($version eq "latest") {
+	   # get latest version from repository
+	   $self->repository($app);
+     }
      $logger->info("download $app-$version.tar.gz");
      $url = "http://$rep->{'server'}:$rep->{'port'}/$app/$app-$version.tar.gz";
      print "download: $app-$version.tar.gz\n";
