@@ -10,7 +10,7 @@ use LWP::UserAgent;
 use Switch;
 use Data::Dump qw(dd);
 
-our @EXPORT = qw( list_versions service_action switch_version get_active repository install delete pack rep_var );
+our @EXPORT = qw( list_versions service_action switch_version get_active repository install delete pack rep_var build_script );
 
 sub new {
 	my ($class, %args) = @_;
@@ -411,6 +411,58 @@ sub rep_var{
     }
   }
   return($var);
+}
+
+
+sub build_script {
+  my $self = shift;
+  my $bb = shift;
+  my $build_path = shift;
+  my $logger = $self->{logger};
+  if ( ! -f $bb->{'build_script'} ) {
+	  print "ERROR: the build script $bb->{'build_script'} does not exist\n";
+	  return 1;
+  } 
+
+  # expand build script with macros
+  open(FILE, "<$bb->{'build_script'}");
+  my @lines = <FILE>;
+  close(FILE);
+  $bb->{'build_script'} =~ m{.*/(.*)};
+  my $script = $1;
+  $logger->debug("Create build script $build_path/$script");
+  open(NEW_FILE, ">$build_path/$script") or die "can't create build_script";
+  foreach(@lines) {
+    while($_ =~ /%([a-z_]+)/g) {
+      if(not defined($1)) {
+        print NEW_FILE $_;
+      } else {
+        $logger->debug("expand macro %$1");
+        my $p = $bb->{$1};
+        if(not defined($p)) {
+          $logger->info("%$1 macro does not exist in config file");
+          print "%$1 macro does not exist in config file\n";
+        } else {
+          $_ =~ s/%$1/$p/;
+        }
+      }
+    }
+    print NEW_FILE $_;
+  }
+  close(NEW_FILE);
+  qx{chmod +x $build_path/$script};
+  # run build script
+  print "Run your build script $build_path/$script: ";
+  qx{$build_path/$script > $build_path/build.log 2>&1};
+  my $exit = $? >> 8;
+  if($exit != 0) {
+    print "ERROR: check your build script and log $build_path/build.log\n";
+    exit 1;
+  } else {
+    print "OK\n";
+    exit 0;
+    return 0;
+  }
 }
 
 1;
