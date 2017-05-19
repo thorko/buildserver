@@ -26,6 +26,9 @@ like(qx/$tool -r repository -a nginx/, qr/nginx-1.12.0.tar.gz/, 'show repository
 # install nginx
 like(qx/$tool -r install -a nginx -v 1.12.0/, qr/Success/, 'install nginx');
 
+# test latest
+like(qx/$tool -r install -a nginx -v latest/, qr/Success/, 'install latest nginx');
+
 # delete nginx
 like(qx/$tool -r delete -a nginx -v 1.12.0/, qr/Success/, 'delete nginx');
 

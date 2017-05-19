@@ -8,6 +8,7 @@ use Config::Simple;
 use HTML::Strip;
 use LWP::UserAgent;
 use Switch;
+use version;
 use Archive::Extract;
 
 our @EXPORT = qw( list_versions service_action switch_version get_active repository install delete pack rep_var build_script );
@@ -279,6 +280,32 @@ sub repository {
    }
 }
 
+sub get_latest {
+	my $self = shift;
+    my $app = shift;
+    my $config = $self->{config};
+    my $logger = $self->{logger};
+    my $rep    = $self->{rep};
+    my $req = "";
+    my $url = "";
+    my $raw = "";
+	my $version = 0;
+    my ($ua) = LWP::UserAgent->new;
+    $url = "http://$rep->{'server'}:$rep->{'port'}/$app";
+    $req = HTTP::Request->new(GET => $url);
+    $raw = $ua->request($req)->content;
+    my $hs = HTML::Strip->new();
+    my $text = $hs->parse($raw);
+    $hs->eof;
+    foreach (split("\n", $text)) {
+	  if($_ =~ /^$app-/) {
+	    $_ =~ s/^$app-(.*)\.tar\.gz/$1/;
+	    $version = $_ if(version->parse($_) > $version);
+	  }
+    }
+	return $version;
+}
+
 sub install {
    my $self = shift;
    my $app = shift;
@@ -296,7 +323,7 @@ sub install {
    } else {
      if ($version eq "latest") {
 	   # get latest version from repository
-	   $self->repository($app);
+	   $version = $self->get_latest($app);
      }
      $logger->info("download $app-$version.tar.gz");
      $url = "http://$rep->{'server'}:$rep->{'port'}/$app/$app-$version.tar.gz";
