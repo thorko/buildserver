@@ -42,4 +42,6 @@ clean:
 test:
 	perl -Mlib=./lib -wc buildctl.pl
 	perl tests/test.t
+
+test_srv:
 	perl tests/srv.t
