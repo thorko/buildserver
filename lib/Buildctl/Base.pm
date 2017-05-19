@@ -313,7 +313,7 @@ sub install {
 	 # make dest
 	 qx{mkdir -p $config->{'install_path'}/$app/$version};
 	 # extract app
-     qx{tar -xzf /tmp/$app-$version.tar.gz -C $config->{'install_path'}/$app/$version --strip-components=3};
+     qx{tar -xzf /tmp/$app-$version.tar.gz --xform=s,usr/local/$app/$version,,g -C $config->{'install_path'}/$app/$version};
      my $exit = $? >> 8;
      if($exit != 0) {
        $logger->error("Couldn't extract /tmp/$app-$version.tar.gz to $config->{'install_path'}/$app/$version");
