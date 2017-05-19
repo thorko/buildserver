@@ -552,6 +552,7 @@ sub pre_post_action {
 }
 
 sub check_install_dir {
+  my $self = shift;
   my $id = shift;
   # don't install if version already exists
   if ( -d $id ) {

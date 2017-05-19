@@ -111,127 +111,127 @@ switch ($command) {
 ##############
 # configure
 ##############
-sub configure {
-  my $build_path = shift; 
-  my $source_dir = shift;
-  my $build_opts = shift;
-  my $log = "configure.log";
-
-  # run build
-  print "Configure: ";
-  qx{cd $build_path/$source_dir && $build_opts > $build_path/$log 2>&1};
-  my $exit = $? >> 8;
-  if ($exit != 0) {
-    print "ERROR: configure $build_opts failed\nCheck $build_path/$log\n";
-    exit 1;
-  } else {
-    print "OK\n";
-    return 0;
-  }
-}
-
-##############
-# make
-##############
-sub make {
-  my $build_path = shift;
-  my $source_dir = shift;
-  my $make_cmd = shift;
-  my $log = "make.log";
-  # run make
-  print "Make: ";
-  qx{cd $build_path/$source_dir && $make_cmd > $build_path/$log 2>&1};
-  my $exit = $? >> 8;
-  if ($exit != 0) {
-    print "ERROR: $make_cmd failed\nCheck $build_path/$log\n";
-    exit 1;
-  } else {
-    print "OK\n";
-    return 0;
-  }
-}
-
-##############
-# make install
-##############
-sub make_install {
-  my $build_path = shift;
-  my $source_dir = shift;
-  my $install_cmd = shift;
-  my $log = "install.log";
-  # run make
-  print "Install: ";
-  qx{cd $build_path/$source_dir && $install_cmd > $build_path/$log 2>&1};
-  my $exit = $? >> 8;
-  if ($exit != 0) {
-    print "ERROR: $install_cmd failed\nCheck $build_path/$log\n";
-    exit 1;
-  } else {
-    print "OK\n";
-    return 0;
-  }
-}
-
-# function to expand macros in variable
-# will take variable and a hash which contains 
-# the macros values
-# return: var - with expanded macros
-sub rep_var{
-  my $var = shift;
-  my $cfghash = shift;
-  my $a = "";
-
-  while($var =~ /%([a-z_]+)/g) {
-    # if $var doesn't contain any variable prefix
-    if(not defined($1)) {
-      return($var);
-    } else {
-      my $a = $cfghash->{$1};
-      if(not defined($a)) {
-        $ll->info("%$1 macro does not exist in config file");
-        print "%$1 macro does not exist in config file\n";
-      } else {
-        $var =~ s/%$1/$a/;
-      }
-    }
-  }
-  return($var);
-}
-
-sub pre_post_action {
-  my $command = shift;
-  my $type = shift;
-  my $build_path = shift;
-
-  print "Running $type command: ";
-  qx{cd $build_path && $command > $build_path/$type.log 2>&1};
-  my $rc = $? >> 8;
-  if ($rc != 0 ) {
-    $ll->error("build command $command failed, check log $build_path/$type.log");
-    print "ERROR: build command $command failed, check log $build_path/$type.log\n";
-    exit 1;
-  }
-  print "OK\n";
-  return 0;
-}
-
-sub check_install_dir {
-  my $id = shift;
-  # don't install if version already exists
-  if ( -d $id ) {
-	  print "ERROR: $id already exists\n";
-	  print "Do you want to continue? (type uppercase yes): ";
-	  my $answer = <STDIN>;
-	  if($answer !~ /YES/) {
-	    exit 0;
-	  }
-  }
-  # check if install_path exists
-  if(! -d $id) {
-    # create install path
-    qx{mkdir -p $id};
-  }
-}
+#sub configure {
+#  my $build_path = shift; 
+#  my $source_dir = shift;
+#  my $build_opts = shift;
+#  my $log = "configure.log";
+#
+#  # run build
+#  print "Configure: ";
+#  qx{cd $build_path/$source_dir && $build_opts > $build_path/$log 2>&1};
+#  my $exit = $? >> 8;
+#  if ($exit != 0) {
+#    print "ERROR: configure $build_opts failed\nCheck $build_path/$log\n";
+#    exit 1;
+#  } else {
+#    print "OK\n";
+#    return 0;
+#  }
+#}
+#
+###############
+## make
+###############
+#sub make {
+#  my $build_path = shift;
+#  my $source_dir = shift;
+#  my $make_cmd = shift;
+#  my $log = "make.log";
+#  # run make
+#  print "Make: ";
+#  qx{cd $build_path/$source_dir && $make_cmd > $build_path/$log 2>&1};
+#  my $exit = $? >> 8;
+#  if ($exit != 0) {
+#    print "ERROR: $make_cmd failed\nCheck $build_path/$log\n";
+#    exit 1;
+#  } else {
+#    print "OK\n";
+#    return 0;
+#  }
+#}
+#
+###############
+## make install
+###############
+#sub make_install {
+#  my $build_path = shift;
+#  my $source_dir = shift;
+#  my $install_cmd = shift;
+#  my $log = "install.log";
+#  # run make
+#  print "Install: ";
+#  qx{cd $build_path/$source_dir && $install_cmd > $build_path/$log 2>&1};
+#  my $exit = $? >> 8;
+#  if ($exit != 0) {
+#    print "ERROR: $install_cmd failed\nCheck $build_path/$log\n";
+#    exit 1;
+#  } else {
+#    print "OK\n";
+#    return 0;
+#  }
+#}
+#
+## function to expand macros in variable
+## will take variable and a hash which contains 
+## the macros values
+## return: var - with expanded macros
+#sub rep_var{
+#  my $var = shift;
+#  my $cfghash = shift;
+#  my $a = "";
+#
+#  while($var =~ /%([a-z_]+)/g) {
+#    # if $var doesn't contain any variable prefix
+#    if(not defined($1)) {
+#      return($var);
+#    } else {
+#      my $a = $cfghash->{$1};
+#      if(not defined($a)) {
+#        $ll->info("%$1 macro does not exist in config file");
+#        print "%$1 macro does not exist in config file\n";
+#      } else {
+#        $var =~ s/%$1/$a/;
+#      }
+#    }
+#  }
+#  return($var);
+#}
+#
+#sub pre_post_action {
+#  my $command = shift;
+#  my $type = shift;
+#  my $build_path = shift;
+#
+#  print "Running $type command: ";
+#  qx{cd $build_path && $command > $build_path/$type.log 2>&1};
+#  my $rc = $? >> 8;
+#  if ($rc != 0 ) {
+#    $ll->error("build command $command failed, check log $build_path/$type.log");
+#    print "ERROR: build command $command failed, check log $build_path/$type.log\n";
+#    exit 1;
+#  }
+#  print "OK\n";
+#  return 0;
+#}
+#
+#sub check_install_dir {
+#  my $id = shift;
+#  # don't install if version already exists
+#  if ( -d $id ) {
+#	  print "ERROR: $id already exists\n";
+#	  print "Do you want to continue? (type uppercase yes): ";
+#	  my $answer = <STDIN>;
+#	  if($answer !~ /YES/) {
+#	    exit 0;
+#	  }
+#  }
+#  # check if install_path exists
+#  if(! -d $id) {
+#    # create install path
+#    qx{mkdir -p $id};
+#  }
+#}
 
 ##############
 # build
@@ -260,9 +260,9 @@ sub build {
   qx{rm -rf $tmpfile};
 
   # replace variables if existing
-  $bb->{'install_path'} = rep_var($bb->{'install_path'}, $bb);
-  $bb->{'url'} = rep_var($bb->{'url'}, $bb);
-  $bb->{'build_opts'} = rep_var($bb->{'build_opts'}, $bb);
+  $bb->{'install_path'} = $buildctl->rep_var($bb->{'install_path'}, $bb);
+  $bb->{'url'} = $buildctl->rep_var($bb->{'url'}, $bb);
+  $bb->{'build_opts'} = $buildctl->rep_var($bb->{'build_opts'}, $bb);
 
   # check if build_script exists and call a different function
   if(defined($bb->{'build_script'})) {
@@ -274,23 +274,23 @@ sub build {
     my $source = $buildctl->extract_source($build_path, $tmpfile, $bb->{'archive_type'});
     # run prebuild_command
     if(defined($bb->{'prebuild_command'}) && $bb->{'prebuild_command'} ne "" ){
-      $bb->{'prebuild_command'} = rep_var($bb->{'prebuild_command'}, $bb);
-      pre_post_action($bb->{'prebuild_command'}, "pre", $build_path);
+      $bb->{'prebuild_command'} = $buildctl->rep_var($bb->{'prebuild_command'}, $bb);
+      $buildctl->pre_post_action($bb->{'prebuild_command'}, "pre", $build_path);
     }
     # configure
-    configure($build_path, $source, $bb->{'build_opts'});
+    $buildctl->configure($build_path, $source, $bb->{'build_opts'});
     # compile
-    make($build_path, $source, $bb->{'make'});
+    $buildctl->make($build_path, $source, $bb->{'make'});
 	# befor installing check install_path
-	check_install_dir($bb->{'install_path'});
+	$buildctl->check_install_dir($bb->{'install_path'});
     # install
-    make_install($build_path, $source, $bb->{'install'});
+    $buildctl->make_install($build_path, $source, $bb->{'install'});
     $ll->info("Sucessfully installed $bb->{'app'} $bb->{'version'}");
 
     # run post build action
     if(defined($bb->{'postbuild_command'}) && $bb->{'postbuild_command'} ne "" ){
-      $bb->{'postbuild_command'} = rep_var($bb->{'postbuild_command'}, $bb);
-      pre_post_action($bb->{'postbuild_command'}, "post", $build_path);
+      $bb->{'postbuild_command'} = $buildctl->rep_var($bb->{'postbuild_command'}, $bb);
+      $buildctl->pre_post_action($bb->{'postbuild_command'}, "post", $build_path);
     }
   }
 
