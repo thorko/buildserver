@@ -4,7 +4,6 @@ use warnings;
 use Log::Log4perl;
 use Getopt::Long;
 use Pod::Usage;
-use Data::Dump qw(dd);
 use Config::Simple;
 use POSIX qw(strftime);
 use HTTP::Server::Brick;
