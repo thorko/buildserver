@@ -614,4 +614,75 @@ sub download {
   }
 }
 
+sub build {
+  my $self = shift;
+  my $build_file = shift;
+  my $logger = $self->{logger};
+
+  if ($build_file eq "") {
+    print "build_file is missing\n";
+    return 0;
+  } elsif (! -f $build_file) {
+    print "build file: $build_file does not exist\n";
+    return 0;
+  }
+  my $cfg = new Config::Simple();
+  $cfg->read($build_file);
+  my $bb = $cfg->get_block("config");
+
+
+  my $tmpfile = "/tmp/app.$bb->{'archive_type'}";
+  my $build_path = defined($bb->{'build_path'}) ? $bb->{'build_path'} : "/tmp/build";
+
+  qx{mkdir -p $build_path};
+  # cleanup build path
+  qx{rm -rf $build_path/*};
+  qx{rm -rf $tmpfile};
+
+  # replace variables if existing
+  $bb->{'install_path'} = $self->rep_var($bb->{'install_path'}, $bb);
+  $bb->{'url'} = $self->rep_var($bb->{'url'}, $bb);
+  $bb->{'build_opts'} = $self->rep_var($bb->{'build_opts'}, $bb);
+
+  # check if build_script exists and call a different function
+  if(defined($bb->{'build_script'})) {
+    $self->build_script($bb, $build_path);
+  } else {
+    # download source
+    $self->download($bb->{'url'}, $tmpfile);
+    # extract source
+    my $source = $self->extract_source($build_path, $tmpfile, $bb->{'archive_type'});
+    # run prebuild_command
+    if(defined($bb->{'prebuild_command'}) && $bb->{'prebuild_command'} ne "" ){
+      $bb->{'prebuild_command'} = $self->rep_var($bb->{'prebuild_command'}, $bb);
+      $self->pre_post_action($bb->{'prebuild_command'}, "pre", $build_path);
+    }
+    # configure
+    $self->configure($build_path, $source, $bb->{'build_opts'});
+    # compile
+    $self->make($build_path, $source, $bb->{'make'});
+	# befor installing check install_path
+	$self->check_install_dir($bb->{'install_path'});
+    # install
+    $self->make_install($build_path, $source, $bb->{'install'});
+    $logger->info("Sucessfully installed $bb->{'app'} $bb->{'version'}");
+
+    # run post build action
+    if(defined($bb->{'postbuild_command'}) && $bb->{'postbuild_command'} ne "" ){
+      $bb->{'postbuild_command'} = $self->rep_var($bb->{'postbuild_command'}, $bb);
+      $self->pre_post_action($bb->{'postbuild_command'}, "post", $build_path);
+    }
+  }
+
+  if(defined($bb->{'keep_build'}) and $bb->{'keep_build'} eq "true") {
+    $logger->info("will keep build directory at $build_path");
+    print "will keep build directory at $build_path\n";
+  } else {
+    # cleanup build path
+    qx{rm -rf $build_path};
+    qx{rm -rf $tmpfile};
+  }
+}
+
+
 1;
