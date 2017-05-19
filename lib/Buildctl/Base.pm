@@ -334,7 +334,7 @@ sub install {
        print "ERROR: $app-$version.tar.gz not available in repository\n";
        return 1;
      }
-	 $logger->debug("result: $r");
+	 $logger->debug("result: $r->{_msg}");
      $logger->info("installing $app-$version.tar.gz");
      print "installing: $app-$version.tar.gz\n";
 	 # make dest
