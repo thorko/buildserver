@@ -3,7 +3,7 @@ _buildctl() {
    COMPREPLY=()
 
    COMMANDS="list-versions get-active repository switch-version install delete build pack"
-   APPS="apache2 bind php5 postfix dovecot mariadb sqlgrey kerberos subversion modsecurity clamav zabbix zabbix-agent openssl"
+   APPS="apache2 bind php5 postfix dovecot mariadb sqlgrey kerberos subversion modsecurity clamav zabbix zabbix-agent openssl nginx"
 
    cur=${COMP_WORDS[COMP_CWORD]}
    prev=${COMP_WORDS[COMP_CWORD-1]}
