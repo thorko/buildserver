@@ -36,7 +36,7 @@ qx(kill -HUP $pid);
 # test build with app config file
 $pid = qx($srv > /dev/null 2>&1 & echo \$!);
 my $build_output = qx{$tool -r build -b tests/apache.conf};
-like($build_output, qr{Will download http://127.0.0.1:8444/nginx/nginx-1.12.0.tar.gz: OK}, 'test download of build');
+like($build_output, qr{Will download http://127.0.0.1:12355/nginx/nginx-1.12.0.tar.gz: OK}, 'test download of build');
 like($build_output, qr{Extract archive /tmp/app.tgz to /tmp/apache2: OK}, 'test extract of downloaded source');
 like($build_output, qr{Configure: OK}, 'test configure of source');
 like($build_output, qr{Make: OK}, 'test make of source');
