@@ -30,22 +30,6 @@ like(qx/$tool -r switch-version -a apache2 -v 1.2.1/, qr/apache2: switched to 1.
 like(qx/$tool -r switch-version -a apache2 -v 1.2.0/, qr/apache2: switched to 1.2.0/, 'switched to version 1.2.0');
 like(qx/$tool -r switch-version -a apache2 -v 1.2.0/, qr/WARN: start-stop script couldn't be found/, 'check warning of service action');
 
-# test repository
-# start server
-my $pid = qx($srv > /dev/null 2>&1 & echo \$!);
-like(qx/$tool -r repository -a nginx/, qr/nginx-1.12.0.tar.gz/, 'show repository');
-# stop repository server
-
-# install nginx
-like(qx/$tool -r install -a nginx -v 1.12.0/, qr/Success/, 'install nginx');
-
-# delete nginx
-like(qx/$tool -r delete -a nginx -v 1.12.0/, qr/Success/, 'delete nginx');
-
-# cleanup
-qx(rm -rf tests/apps/nginx);
-qx(kill -HUP $pid);
-
 # pack an app
 like(qx/$tool -r pack -a apache2 -v 1.2.1 -p \/tmp\//, qr/Packaging apache2 1.2.1: OK/, 'pack app apache2');
 qx{rm -f /tmp/apache2-1.2.1.tar.gz};
@@ -70,16 +54,5 @@ ok((fgrep { /https.*mariadb-5\.5\.56\.tar\.gz/ } $scriptfile) == 1, 'found versi
 ok((fgrep { /configure.*mariadb.5\.5\.56 --with/ } $scriptfile) == 1, 'found version in configure line');
 # clean up
 qx{rm -rf /tmp/test_mariadb};
-
-# test build with app config file
-$pid = qx($srv > /dev/null 2>&1 & echo \$!);
-my $build_output = qx{$tool -r build -b tests/apache.conf};
-like($build_output, qr{Will download http://127.0.0.1:8444/nginx/nginx-1.12.0.tar.gz: OK}, 'test download of build');
-like($build_output, qr{Extract archive /tmp/app.tgz to /tmp/apache2: OK}, 'test extract of downloaded source');
-like($build_output, qr{Configure: OK}, 'test configure of source');
-like($build_output, qr{Make: OK}, 'test make of source');
-like($build_output, qr{Install: OK}, 'test install of source');
-# cleanup
-qx(kill -HUP $pid);
 
 done_testing();
