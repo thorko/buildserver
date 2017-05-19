@@ -115,6 +115,10 @@ buildctl -r repository -a bind # list all packages of bind
 ```
 buildctl -a bind -v 9.10.4-P6 -r install
 ```
+Install latest version of bind
+```
+buildctl -a bind -v latest -r install
+```
 This will download the package from the repository server and install it to 
 the **install_path** setting in **/etc/buildctl/buildctl.conf**
 
