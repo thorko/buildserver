@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/thorko/buildserver.svg?branch=master)](https://travis-ci.org/thorko/buildserver)
+
 BUILDCTL
 ========
 
