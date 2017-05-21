@@ -41,6 +41,5 @@ clean:
 
 test:
 	perl -Mlib=./lib -wc buildctl.pl
-	cover -test -report coveralls
-	#perl tests/test.t
-	#perl tests/srv.t
+	perl tests/test.t
+	perl tests/srv.t
