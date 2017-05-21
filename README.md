@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/thorko/buildserver.svg?branch=master)](https://travis-ci.org/thorko/buildserver)
+[![Coverage Status](https://coveralls.io/repos/github/thorko/buildserver/badge.svg?branch=master)](https://coveralls.io/github/thorko/buildserver?branch=master)
 
 BUILDCTL
 ========
