@@ -34,6 +34,7 @@ like(qx/$tool -r install -a nginx -v latest/, qr/Success/, 'install latest nginx
 
 # delete nginx
 like(qx/$tool -r delete -a nginx -v 1.12.0/, qr/Success/, 'delete nginx');
+like(qx/$tool -r delete -a apache2 -v 1.2.0/, qr/ERROR: apache2: can't delete active version 1.2.0/, 'delete active version apache2');
 
 # cleanup
 qx(rm -rf tests/apps/nginx);
