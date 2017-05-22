@@ -13,7 +13,7 @@ BUILDCTL
   - Config-Simple
   - Log-Log4perl
   - HTML-Strip
-  - Data-Dump
+  - Linux-Distribution
 
 - Supports: Debian, CentOS, RedHat, Fedora
 ```
