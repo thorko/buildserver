@@ -659,12 +659,18 @@ sub install_requirements {
   switch($distro) {
     case "debian" { 
 		qx{apt-get -y install $requirements};
+		$ret = $? >> 8;
+		$error = "FAILED: apt-get -y install $requirements" if($ret);
 	}
 	case "redhat" {
 		qx{yum -y install $requirements};
+		$ret = $? >> 8;
+		$error = "FAILED: apt-get -y install $requirements" if($ret);
 	}
 	case "centos" { 
 		qx{yum -y install $requirements};
+		$ret = $? >> 8;
+		$error = "FAILED: apt-get -y install $requirements" if($ret);
 	}
 	else { $ret = 1; $error = "distro $distro not supported\n"; }
   }
