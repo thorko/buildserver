@@ -27,6 +27,7 @@ like(qx/$tool -r repository -a nginx/, qr/nginx-1.12.0.tar.gz/, 'show repository
 
 # install nginx
 like(qx/$tool -r install -a nginx -v 1.12.0/, qr/Success/, 'install nginx');
+like(qx/$tool -r install -a mailsrv -v 1.12.0/, qr/ERROR: mailsrv-1.12.0.tar.gz not available in repository/, 'app not available in repository');
 
 # test latest
 like(qx/$tool -r install -a nginx -v latest/, qr/Success/, 'install latest nginx');

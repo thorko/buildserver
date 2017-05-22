@@ -21,9 +21,12 @@ like(qx/$tool -h/, qr/list all versions of applications/, 'check help message');
 
 # list-versions
 like(qx/$tool -r list-versions/, qr/php5:  0.0.1  0.0.2/, 'list application versions');
+# list-version of app
+like(qx/$tool -r list-versions -a apache2/, qr/apache2:  1.2.0  1.2.1/, 'list version of app apache2');
 
 # get-active
 like(qx/$tool -r get-active/, qr/apache2: 1.2.0/, 'get active version');
+like(qx/$tool -r get-active -a apache2/, qr/apache2: 1.2.0/, 'get active version of apache');
 
 # switch version
 like(qx/$tool -r switch-version -a apache2 -v 1.2.1/, qr/apache2: switched to 1.2.1/, 'switched to version 1.2.1');
