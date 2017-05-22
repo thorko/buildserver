@@ -10,6 +10,7 @@ use LWP::UserAgent;
 use Switch;
 use version;
 use Archive::Extract;
+use Linux::Distribution qw(distribution_name distribution_version);
 
 our @EXPORT = qw( list_versions service_action switch_version get_active repository install delete pack rep_var build_script );
 
@@ -641,6 +642,30 @@ sub download {
   }
 }
 
+sub install_requirements {
+  my $self = shift;
+  my $requirements = shift;
+  my $logger = $self->{logger};
+  my $ret = 1;
+  my $error = "";
+
+  my $distro = distribution_name();
+
+  switch($distro) {
+    case "debian" { 
+		qx{apt-get -y install $requirements};
+	}
+	case "redhat" {
+		qx{yum -y install $requirements};
+	}
+	case "centos" { 
+		qx{yum -y install $requirements};
+	}
+	else { $ret = 0; $error = "distro $distro not supported\n"; }
+  }
+  return ($ret, $error);
+}
+
 sub build {
   my $self = shift;
   my $build_file = shift;
@@ -670,6 +695,18 @@ sub build {
   $bb->{'install_path'} = $self->rep_var($bb->{'install_path'}, $bb);
   $bb->{'url'} = $self->rep_var($bb->{'url'}, $bb);
   $bb->{'build_opts'} = $self->rep_var($bb->{'build_opts'}, $bb);
+
+  # install requirements
+  if(defined($bb->{'build_requirements'}) and $bb->{'build_requirements'} ne "") {
+	my ($ret, $error) = $self->install_requirements($bb->{'build_requirements'});
+	if($ret == 0) {
+		print "Requirements installed: OK\n";
+	} else {
+		print "Requirements installed: ERROR\n";
+		print "$error\n";
+		exit 1;
+	}
+  }
 
   # check if build_script exists and call a different function
   if(defined($bb->{'build_script'})) {
