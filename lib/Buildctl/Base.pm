@@ -649,6 +649,11 @@ sub install_requirements {
   my $ret = 1;
   my $error = "";
 
+
+  my $uid = $<;
+  if($uid != 0) {
+	return (1, "Only root can install packages\n");
+  }
   my $distro = distribution_name();
 
   switch($distro) {
@@ -661,7 +666,7 @@ sub install_requirements {
 	case "centos" { 
 		qx{yum -y install $requirements};
 	}
-	else { $ret = 0; $error = "distro $distro not supported\n"; }
+	else { $ret = 1; $error = "distro $distro not supported\n"; }
   }
   return ($ret, $error);
 }
@@ -704,7 +709,7 @@ sub build {
 	} else {
 		print "Requirements installed: ERROR\n";
 		print "$error\n";
-		exit 1;
+		# fail soft
 	}
   }
 
