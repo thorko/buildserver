@@ -13,11 +13,6 @@ my $help = 0;
 my $debug = 0;
 my ($config, $command, $app, $version, $build_file, $path) = ("", "", "", "", "");
 
-sub print_help {
-	print "Usage: buildctl.pl [-c config file] -r <command>";
-	return 0;
-}
-
 Getopt::Long::Configure('bundling');
 GetOptions(
   "c|config=s"     => \$config,
