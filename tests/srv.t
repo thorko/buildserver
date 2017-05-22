@@ -48,6 +48,7 @@ like($build_output, qr{Running pre command: OK}, 'test prebuild command');
 like($build_output, qr{Configure: OK}, 'test configure of source');
 like($build_output, qr{Make: OK}, 'test make of source');
 like($build_output, qr{Install: OK}, 'test install of source');
+like($build_output, qr{Running post command: OK}, 'test prebuild command');
 # cleanup
 qx(kill -HUP $pid);
 
