@@ -42,7 +42,7 @@ qx(kill -HUP $pid);
 
 # test build with app config file
 $pid = qx($srv > /dev/null 2>&1 & echo \$!);
-my $build_output = qx{sudo $tool -r build -b tests/apache.conf};
+my $build_output = qx{$tool -r build -b tests/apache.conf};
 like($build_output, qr{Requirements installed: ERROR}, 'install build requirements');
 like($build_output, qr{Will download http://localhost:12355/nginx/nginx-1.12.0.tar.gz: OK}, 'test download of build');
 like($build_output, qr{Extract archive /tmp/app.tgz to /tmp/apache2: OK}, 'test extract of downloaded source');
