@@ -52,6 +52,9 @@ is($b->rep_var($buildhash->{'install_path'}, $buildhash), '/usr/local/mariadb/5.
 is($b->rep_var($buildhash->{'url'}, $buildhash), 'https://downloads.mariadb.org/f/mariadb-5.5.56/source/mariadb-5.5.56.tar.gz/from/http%3A//ftp.hosteurope.de/mirror/mariadb.org/?serve', 'test build file expansion 2');
 is($b->rep_var($buildhash->{'make'}, $buildhash), 'make %test', 'test failed macro expansion');
 
+is($b->switch_version("", ""), 1, 'switch_version without app');
+is($b->switch_version("apache2", "1.9.0"), 1, 'switch_version version not available');
+
 # test build file missing
 is($b->build(""), 0, 'test build file missing');
 is($b->build("/tmp/t"), 0, 'test build file does not exist');

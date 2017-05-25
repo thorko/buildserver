@@ -195,12 +195,12 @@ sub switch_version {
    my $config = $self->{config};
    my $logger = $self->{logger};
    if ($app eq "" || $version eq "") {
-     print "no app given or version\n";
-	 return;
+     print "no app or version given\n";
+	 return 1;
    } else {
 	 if ( ! -d "$config->{'install_path'}/$app/$version" ) {
 		print "ERROR: $app version $version not available\n";
-		return 0;
+		return 1;
 	 }
 	 # stop service
 	 $self->service_action($app, "stop");
