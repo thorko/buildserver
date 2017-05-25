@@ -55,6 +55,8 @@ is($b->rep_var($buildhash->{'make'}, $buildhash), 'make %test', 'test failed mac
 is($b->switch_version("", ""), 1, 'switch_version without app');
 is($b->switch_version("apache2", "1.9.0"), 1, 'switch_version version not available');
 
+is($b->download("http://tt.tt/tt.tar.gz", "/tmp/a.tar.gz"), 1, 'failed download');
+
 # test build file missing
 is($b->build(""), 0, 'test build file missing');
 is($b->build("/tmp/t"), 0, 'test build file does not exist');
@@ -66,5 +68,6 @@ ok((fgrep { /https.*mariadb-5\.5\.56\.tar\.gz/ } $scriptfile) == 1, 'found versi
 ok((fgrep { /configure.*mariadb.5\.5\.56 --with/ } $scriptfile) == 1, 'found version in configure line');
 # clean up
 qx{rm -rf /tmp/test_mariadb};
+
 
 done_testing();

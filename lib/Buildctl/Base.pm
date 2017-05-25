@@ -581,10 +581,10 @@ sub pre_post_action {
 
 sub check_install_dir {
   my $self = shift;
-  my $id = shift;
+  my $dir = shift;
   # don't install if version already exists
-  if ( -d $id ) {
-	  print "ERROR: $id already exists\n";
+  if ( -d $dir ) {
+	  print "ERROR: $dir already exists\n";
 	  print "Do you want to continue? (type uppercase yes): ";
 	  my $answer = <STDIN>;
 	  if($answer !~ /YES/) {
@@ -592,9 +592,9 @@ sub check_install_dir {
 	  }
   }
   # check if install_path exists
-  if(! -d $id) {
+  if(! -d $dir) {
     # create install path
-    qx{mkdir -p $id};
+    qx{mkdir -p $dir};
   }
 }
 
@@ -635,7 +635,7 @@ sub download {
   if($exit != 0) {
     $logger->error("$url couldn't be downloaded.");
     print "ERROR: $url couldn't be downloaded\n";
-    exit 1;
+    return 1;
   } else { 
     print "OK\n";
     return 0;
@@ -724,7 +724,9 @@ sub build {
     $self->build_script($bb, $build_path);
   } else {
     # download source
-    $self->download($bb->{'url'}, $tmpfile);
+    if($self->download($bb->{'url'}, $tmpfile)) {
+		return 1;
+	}
     # extract source
     my $source = $self->extract_source($build_path, $tmpfile, $bb->{'archive_type'});
     # run prebuild_command
