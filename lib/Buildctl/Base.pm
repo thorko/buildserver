@@ -488,7 +488,6 @@ sub build_script {
     exit 1;
   } else {
     print "OK\n";
-    exit 0;
     return 0;
   }
 }
