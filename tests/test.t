@@ -54,12 +54,17 @@ is($b->rep_var($buildhash->{'make'}, $buildhash), 'make %test', 'test failed mac
 
 is($b->switch_version("", ""), 1, 'switch_version without app');
 is($b->switch_version("apache2", "1.9.0"), 1, 'switch_version version not available');
+is($b->switch_version("apache2", "1.9.0"), 1, 'switch_version version not available');
 
 is($b->download("http://tt.tt/tt.tar.gz", "/tmp/a.tar.gz"), 1, 'failed download');
 
 # test build file missing
 is($b->build(""), 0, 'test build file missing');
 is($b->build("/tmp/t"), 0, 'test build file does not exist');
+
+# pack
+is($b->pack("apache2", "", "/tmp/"), 1, "pack - required options missing");
+is($b->pack("apache2", "1.2.0", "/tmp2/"), 1, "pack - couldn't pack");
 
 # test build script expansion
 like(qx{$tool -r build -b tests/mariadb.conf}, qr{Run your build script /tmp/test_mariadb/mariadb.sh: ERROR: check your build script and log /tmp/test_mariadb/build.log}, 'create build script');

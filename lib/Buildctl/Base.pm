@@ -399,7 +399,7 @@ sub pack {
 
   if ($app eq "" || $version eq "" || $path eq "") {
     print "some required option not set\n";
-    exit 0;
+    return 1;
   }
 
   print "Packaging $app $version: ";
@@ -408,7 +408,7 @@ sub pack {
   if ($rc != 0 ) {
     $logger->error("packaging of $app $version failed");
     print "ERROR: packaging of $app $version failed\n";
-    exit 1;
+    return 1;
   }
   print "OK\n";
 }
