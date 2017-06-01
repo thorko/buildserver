@@ -61,7 +61,7 @@ sub new {
 		if($a->{$l} == 1) {
 			push @apps, $l;
 		}
-  }
+        }
 	$self->{apps} = \@apps;
 
 	$self->{rep} = $cfg->get_block("repository");
@@ -304,7 +304,7 @@ sub get_latest {
 	    $version = $_ if(version->parse($_) > $version);
 	  }
     }
-	return $version;
+    return $version;
 }
 
 sub install {
@@ -408,7 +408,8 @@ sub pack {
   if ($rc != 0 ) {
     $logger->error("packaging of $app $version failed");
     print "ERROR: packaging of $app $version failed\n";
-  print "OK\n";
+    print "OK\n";
+  }
 }
 
 # function to expand macros in variable
@@ -554,7 +555,7 @@ sub update {
   $ret = $self->build($buildfile);
   if ($ret) {
     $logger->error("Updating app: $app to $version: FAILED");
-	print "Build FAILED\n";
+    print "Build FAILED\n";
   }
   if ( ! -d $reppath ) {
 	qx{mkdir -p $reppath};
@@ -562,7 +563,7 @@ sub update {
   $ret = $self->pack($app, $version, $reppath);
   if ($ret) {
     $logger->error("Packaging of $app $version: FAILED");
-	print "Packaging FAILED\n";
+    print "Packaging FAILED\n";
   }
   return $ret;
 
@@ -755,8 +756,8 @@ sub build {
   } else {
     # download source
     if($self->download($bb->{'url'}, $tmpfile)) {
-		return 1;
-	}
+	return 1;
+    }
     # extract source
     my $source = $self->extract_source($build_path, $tmpfile, $bb->{'archive_type'});
     # run prebuild_command
