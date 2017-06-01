@@ -38,6 +38,8 @@ like(qx/$tool -r switch-version -a apache2 -v 1.2.0/, qr/WARN: start-stop script
 like(qx/$tool -r pack -a apache2 -v 1.2.1 -p \/tmp\//, qr/Packaging apache2 1.2.1: OK/, 'pack app apache2');
 qx{rm -f /tmp/apache2-1.2.1.tar.gz};
 
+# update an app
+like(qx/$tool -r update -b tests\/mariadb.conf/, qr/Updating app: mariadb to 5.5.56/, 'update app mariadb');
 
 # test rep_var
 my $hash = { install_path => '/usr/local/%app/%version', app => 'bind', version => '9.10.4-P8'};

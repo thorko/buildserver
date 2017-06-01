@@ -549,9 +549,15 @@ sub update {
   my $bb = $cfg->get_block("config");
   my $version = $bb->{'version'};
   my $app = $bb->{'app'};
+  my $reppath = "$config->{'repository'}/$app";
   my $ret = 0;
+  $logger->info("Updating app: $app to $version");
+  print "Updating app: $app to $version\n";
   $ret = $self->build($buildfile);
-  $ret = $self->pack($app, $version, "$config->{'repository'}/$app");
+  if ( ! -d $reppath ) {
+	qx{mkdir -p $reppath};
+  }
+  $ret = $self->pack($app, $version, $reppath);
   return $ret;
 
 }
