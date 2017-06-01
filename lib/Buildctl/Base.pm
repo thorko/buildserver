@@ -554,10 +554,18 @@ sub update {
   $logger->info("Updating app: $app to $version");
   print "Updating app: $app to $version\n";
   $ret = $self->build($buildfile);
+  if ($ret) {
+    $logger->error("Updating app: $app to $version: FAILED");
+	print "Build FAILED\n";
+  }
   if ( ! -d $reppath ) {
 	qx{mkdir -p $reppath};
   }
   $ret = $self->pack($app, $version, $reppath);
+  if ($ret) {
+    $logger->error("Packaging of $app $version: FAILED");
+	print "Packaging FAILED\n";
+  }
   return $ret;
 
 }
@@ -708,10 +716,10 @@ sub build {
 
   if ($build_file eq "") {
     print "build_file is missing\n";
-    return 0;
+    return 1;
   } elsif (! -f $build_file) {
     print "build file: $build_file does not exist\n";
-    return 0;
+    return 1;
   }
   my $cfg = new Config::Simple();
   $cfg->read($build_file);

@@ -61,8 +61,8 @@ is($b->switch_version("apache2", "1.9.0"), 1, 'switch_version version not availa
 is($b->download("http://tt.tt/tt.tar.gz", "/tmp/a.tar.gz"), 1, 'failed download');
 
 # test build file missing
-is($b->build(""), 0, 'test build file missing');
-is($b->build("/tmp/t"), 0, 'test build file does not exist');
+is($b->build(""), 1, 'test build file missing');
+is($b->build("/tmp/t"), 1, 'test build file does not exist');
 
 # pack
 is($b->pack("apache2", "", "/tmp/"), 1, "pack - required options missing");
