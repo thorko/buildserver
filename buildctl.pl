@@ -47,7 +47,7 @@ switch ($command) {
 	case "install" { $buildctl->install($app, $version) }
 	case "delete" { $buildctl->delete($app, $version) }
 	case "build" { $buildctl->build($build_file) }
-    case "pack" { $buildctl->pack($app, $version, $path) }
+    case "pack" { $buildctl->pack($app, $version) }
 	case "update" { $buildctl->update($build_file) }
 	else { pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  }
 }
@@ -114,7 +114,7 @@ requires --build-file: build the app from source
 
 =item B<pack>
 
-requires --app, --version, --path: will pack the app in version and move it to path
+requires --app, --version: will pack the app in version and move it to path
 
 =item B<update>
 

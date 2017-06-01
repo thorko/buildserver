@@ -393,8 +393,8 @@ sub pack {
   my $self = shift;
   my $app = shift;
   my $version = shift;
-  my $path = shift;
   my $config = $self->{config};
+  my $path = $config->{repository};
   my $logger = $self->{logger};
 
   if ($app eq "" || $version eq "" || $path eq "") {
@@ -408,8 +408,6 @@ sub pack {
   if ($rc != 0 ) {
     $logger->error("packaging of $app $version failed");
     print "ERROR: packaging of $app $version failed\n";
-    return 1;
-  }
   print "OK\n";
 }
 
