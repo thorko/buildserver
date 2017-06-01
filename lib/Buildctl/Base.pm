@@ -537,6 +537,25 @@ sub make {
   }
 }
 
+# function to update apps automatically
+sub update {
+  my $self = shift;
+  my $buildfile = shift;
+  my $logger = $self->{logger};
+  my $config = $self->{config};
+
+  my $cfg = new Config::Simple();
+  $cfg->read($buildfile);
+  my $bb = $cfg->get_block("config");
+  my $version = $bb->{'version'};
+  my $app = $bb->{'app'};
+  my $ret = 0;
+  $ret = $self->build($buildfile);
+  $ret = $self->pack($app, $version, "$config->{'repository'}/$app");
+  return $ret;
+
+}
+
 ##############
 # make install
 ##############

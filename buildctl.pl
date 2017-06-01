@@ -31,6 +31,7 @@ pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } 
 pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  if ($command eq "delete" && ($app eq "" || $version eq ""));
 pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  if ($command eq "build" && $build_file eq "");
 pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  if ($command eq "pack" && ($app eq "" ||  $version eq ""));
+pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  if ($command eq "update" && $app eq "");
 
 $config = defined($config) && $config ne "" ? $config : "/etc/buildctl/buildctl.conf";
 
@@ -47,6 +48,7 @@ switch ($command) {
 	case "delete" { $buildctl->delete($app, $version) }
 	case "build" { $buildctl->build($build_file) }
     case "pack" { $buildctl->pack($app, $version, $path) }
+	case "update" { }
 	else { pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  }
 }
 
@@ -113,3 +115,7 @@ requires --build-file: build the app from source
 =item B<pack>
 
 requires --app, --version, --path: will pack the app in version and move it to path
+
+=item B<update>
+
+requires --app: will build app and packing it
