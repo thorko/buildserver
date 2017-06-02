@@ -408,6 +408,8 @@ sub pack {
   if ($rc != 0 ) {
     $logger->error("packaging of $app $version failed");
     print "ERROR: packaging of $app $version failed\n";
+  } else {
+	$logger->info("packaging of $app $version");
     print "OK\n";
   }
 }

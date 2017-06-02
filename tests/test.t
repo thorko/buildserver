@@ -35,7 +35,7 @@ like(qx/$tool -r switch-version -a apache2 -v 1.2.0/, qr/apache2: switched to 1.
 like(qx/$tool -r switch-version -a apache2 -v 1.2.0/, qr/WARN: start-stop script couldn't be found/, 'check warning of service action');
 
 # pack an app
-like(qx/$tool -r pack -a apache2 -v 1.2.1 -p \/tmp\//, qr/Packaging apache2 1.2.1: OK/, 'pack app apache2');
+like(qx/$tool -r pack -a apache2 -v 1.2.1/, qr/Packaging apache2 1.2.1: OK/, 'pack app apache2');
 qx{rm -f /tmp/apache2-1.2.1.tar.gz};
 
 # update an app
