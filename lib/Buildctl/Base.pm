@@ -403,7 +403,10 @@ sub pack {
   }
 
   print "Packaging $app $version: ";
-  qx{tar -czf $path/$app-$version.tar.gz -C $config->{'install_path'}/$app/$version . > /dev/null 2>&1};
+  if ( ! -d "$path/$app") {
+    qx{mkdir -p $path/$app};
+  }
+  qx{tar -czf $path/$app/$app-$version.tar.gz -C $config->{'install_path'}/$app/$version . > /dev/null 2>&1};
   my $rc = $? >> 8;
   if ($rc != 0 ) {
     $logger->error("packaging of $app $version failed");
@@ -562,7 +565,7 @@ sub update {
   if ( ! -d $reppath ) {
 	qx{mkdir -p $reppath};
   }
-  $ret = $self->pack($app, $version, $reppath);
+  $ret = $self->pack($app, $version);
   if ($ret) {
     $logger->error("Packaging of $app $version: FAILED");
     print "Packaging FAILED\n";

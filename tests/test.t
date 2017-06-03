@@ -36,7 +36,7 @@ like(qx/$tool -r switch-version -a apache2 -v 1.2.0/, qr/WARN: start-stop script
 
 # pack an app
 like(qx/$tool -r pack -a apache2 -v 1.2.1/, qr/Packaging apache2 1.2.1: OK/, 'pack app apache2');
-qx{rm -f /tmp/apache2-1.2.1.tar.gz};
+qx{rm -f /tmp/apache2/apache2-1.2.1.tar.gz};
 
 # update an app
 like(qx/$tool -r update -b tests\/mariadb.conf/, qr/Updating app: mariadb to 5.5.56/, 'update app mariadb');
