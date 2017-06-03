@@ -65,8 +65,8 @@ is($b->build(""), 1, 'test build file missing');
 is($b->build("/tmp/t"), 1, 'test build file does not exist');
 
 # pack
-is($b->pack("apache2", "", "/tmp/"), 1, "pack - required options missing");
-is($b->pack("apache2", "1.2.0", "/tmp2/"), 1, "pack - couldn't pack");
+is($b->pack("apache2", ""), 1, "pack - required options missing");
+is($b->pack("apache2", "1.2.0"), 0, "pack - couldn't pack");
 
 # test build script expansion
 like(qx{$tool -r build -b tests/mariadb.conf}, qr{Run your build script /tmp/test_mariadb/mariadb.sh: ERROR: check your build script and log /tmp/test_mariadb/build.log}, 'create build script');
