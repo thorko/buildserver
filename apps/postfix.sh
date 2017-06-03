@@ -16,7 +16,7 @@ cd %build_path/%app-%version
 
 tp="%install_path"
 mkdir -p $tp/etc
-cp -p /etc/%app_build/main.cf $tp/etc/
+cp -p /etc/postfix_build/main.cf $tp/etc/
 cp -p /etc/postfix_build/master.cf $tp/etc/
 
 make -f Makefile.init makefiles CCARGS='-DHAS_MYSQL -I/usr/local/mariadb/current/include/mysql -DUSE_SSL -I/usr/local/openssl/1.0.2j-sslv2/include -DUSE_TLS -DUSE_SASL_AUTH -DDEF_CONFIG_DIR=\"'$tp'/etc\" -DDEF_DATA_DIR=\"/var/lib/postfix\" -DDEF_COMMAND_DIR=\"'$tp'/sbin\" -DDEF_QUEUE_DIR=\"/var/spool/postfix\" -DDEF_DAEMON_DIR=\"'$tp'/libexec\"' AUXLIBS='-L/usr/lib -L/usr/local/openssl/1.0.2j-sslv2/lib -lmysqlclient -lz -lm -lssl -lcrypto'
