@@ -37,6 +37,39 @@ This will remove the tool
 make clean
 ```
 
+# Configuration of buildctl client
+the configuration will be installed in /etc/buildctl/buildctl.conf
+```
+[log]
+loglevel=DEBUG
+logfile=/var/log/buildctl.log
+
+[config]
+# the root path where the apps will be installed
+install_path=/usr/local
+# can be systemd or initd
+init_sysv=systemd
+# restart method
+# soft=don't fail when init or systemd file not found
+# hard=fail when init or systemd file not found
+# ignore=don't restart anything just ignore it
+restart=soft
+# the path to the repository 
+# will be used when packaging apps
+repository=/var/repository
+
+[apps]
+# 1 = enabled
+# 0 = disabled
+apache2=1
+php5=1
+
+# the server which contains the repository
+[repository]
+server=127.0.0.1
+port=8082
+```
+
 ## Usage
 To build an app from source run
 ```
@@ -88,9 +121,14 @@ buildctl -r build -b <your build file>
 ```
 When done successful you can create the package with
 ```
-buildctl -r pack -a bind -v 9.10.4-P6 -p /var/repository/bind
+buildctl -r pack -a bind -v 9.10.4-P6
 ```
 This will create an Tar/GZ-File in /var/repository/bind
+
+Update an app - will build app and create package in repository path
+```
+buildctl -r update -b /etc/buildctl/apps/apache2.conf
+```
 
 ### Repository Server
 to start repository server use the configuration file at **/etc/buildctl/buildsrv.conf**
