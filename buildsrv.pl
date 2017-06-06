@@ -5,6 +5,7 @@ use Log::Log4perl;
 use Getopt::Long;
 use Pod::Usage;
 use Config::Simple;
+use File::Slurp;
 use POSIX qw(strftime);
 use HTTP::Server::Brick;
 my $help = 0;
@@ -64,7 +65,43 @@ our $ll = Log::Log4perl->get_logger();
 my $srv = HTTP::Server::Brick->new(port=>$cc->{'port'}, host=>$cc->{'hostname'});
 $ll->info("Starting Server at $cc->{'port'}");
 $ll->info("Serving $cc->{'path'}");
-$srv->mount("/" => { path => $cc->{'path'} });
+#$srv->mount("/" => { path => $cc->{'path'} });
+
+# new implementation
+$srv->mount("/" => {
+  handler => sub{
+	# HTTP::Request and HTTP::Response object
+	my ($req, $res) = @_;
+	# return root path of $cc->{'path'}
+	if (not defined($req->{path_info})) {
+		my $dirs = qx{ls $cc->{'path'}};
+		$res->add_content($dirs);
+	} else {
+		# the packages
+		if("$cc->{'path'}/$req->{path_info}" =~ /\.tar\.gz|\.tgz/) {
+		  if(-f "$cc->{'path'}/$req->{path_info}") {
+		    my $data = read_file("$cc->{'path'}/$req->{path_info}", { binmode => ':raw' });
+			$res->content($data);
+		  } else {
+			$res->code(404);
+		    $res->content("$cc->{'path'}/$req->{path_info} NOT FOUND");
+		  }
+		# the directories
+		} elsif (-d "$cc->{'path'}/$req->{path_info}") {
+		  my $files = qx{ls $cc->{'path'}/$req->{path_info}};
+		  $res->content($files);
+		# uri not found
+		} else {
+		  $res->code(404);
+		  $res->content("$req->{path_info} NOT FOUND");
+		}
+	}
+	1;
+  },
+  wildcard => 1, # return all matches
+		   });
+
+
 $srv->start;
 
 __END__

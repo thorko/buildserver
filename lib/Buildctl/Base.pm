@@ -260,22 +260,19 @@ sub repository {
       $logger->debug("Call: $url");
       $req = HTTP::Request->new(GET => $url);
       $raw = $ua->request($req)->content;
-      my $hs = HTML::Strip->new();
-      my $text = $hs->parse($raw);
-      $hs->eof;
       my $appl = "";
-      foreach (split("\n", $text)) {
-        print grep {/^([a-z0-9A-Z\-\.]*)\/$/ } $_ . "\n";
+      foreach (split("\n", $raw)) {
+        print grep {/^([a-z0-9A-Z\-\.\/]*)$/ } $_ . "\n";
       }
    } else {
       $url = "http://$rep->{'server'}:$rep->{'port'}/$app";
       $logger->debug("Call: $url");
       $req = HTTP::Request->new(GET => $url);
       $raw = $ua->request($req)->content;
-      my $hs = HTML::Strip->new();
-      my $text = $hs->parse($raw);
-      $hs->eof;
-      foreach (split("\n", $text)) {
+	  #my $hs = HTML::Strip->new();
+	  #my $text = $hs->parse($raw);
+	  #$hs->eof;
+      foreach (split("\n", $raw)) {
         print "$_\n" if ($_ =~ /^$app.*/);
       }
    }
