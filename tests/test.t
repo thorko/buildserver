@@ -30,9 +30,9 @@ like(qx/$tool -r get-active/, qr/apache2: 1.2.0/, 'get active version');
 like(qx/$tool -r get-active -a apache2/, qr/apache2: 1.2.0/, 'get active version of apache');
 
 # switch version
-like(qx/$tool -r switch-version -a apache2 -v 1.2.1/, qr/apache2: switched to 1.2.1/, 'switched to version 1.2.1');
-like(qx/$tool -r switch-version -a apache2 -v 1.2.0/, qr/apache2: switched to 1.2.0/, 'switched to version 1.2.0');
-like(qx/$tool -r switch-version -a apache2 -v 1.2.0/, qr/WARN: start-stop script couldn't be found/, 'check warning of service action');
+like(qx/$tool -r activate -a apache2 -v 1.2.1/, qr/apache2: activated 1.2.1/, 'switched to version 1.2.1');
+like(qx/$tool -r activate -a apache2 -v 1.2.0/, qr/apache2: activated 1.2.0/, 'switched to version 1.2.0');
+like(qx/$tool -r activate -a apache2 -v 1.2.0/, qr/WARN: start-stop script couldn't be found/, 'check warning of service action');
 
 # pack an app
 like(qx/$tool -r pack -a apache2 -v 1.2.1/, qr/Packaging apache2 1.2.1: OK/, 'pack app apache2');

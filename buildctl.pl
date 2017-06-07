@@ -26,7 +26,7 @@ GetOptions(
 );
 
 pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  if ($command eq "");
-pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  if ($command eq "switch-version" && ($app eq "" || $version eq ""));
+pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  if ($command eq "activate" && ($app eq "" || $version eq ""));
 pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  if ($command eq "install" && ($app eq "" || $version eq ""));
 pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  if ($command eq "delete" && ($app eq "" || $version eq ""));
 pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  if ($command eq "build" && $build_file eq "");
@@ -42,7 +42,7 @@ my $exit = 0;
 switch ($command) {
 	case "list-versions" { $buildctl->list_versions($app) }
 	case "get-active" { $buildctl->get_active($app) }
-	case "switch-version" { $buildctl->switch_version($app, $version) }
+	case "activate" { $buildctl->switch_version($app, $version) }
 	case "repository" { $buildctl->repository($app) }
 	case "install" { $buildctl->install($app, $version) }
 	case "delete" { $buildctl->delete($app, $version) }
@@ -92,9 +92,9 @@ list all versions of applications
 
 get the active versions of applications
 
-=item B<switch-version>
+=item B<activate>
 
-requires --app, --version: switch version of app
+requires --app, --version: activate version of app
 
 =item B<repository>
 

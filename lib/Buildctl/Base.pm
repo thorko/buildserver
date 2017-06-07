@@ -208,11 +208,11 @@ sub switch_version {
 	 qx{ln -sfn $config->{'install_path'}/$app/$version $config->{'install_path'}/$app/current};
 	 my $exit = $? >> 8;
 	 if($exit != 0) {
-		print "ERROR: $app couldn't switch to $version\n";
+		print "ERROR: $app couldn't activate $version\n";
 		print "ln -sfn failed\n";
 		exit $exit;
 	 } else {
-		print "$app: switched to $version\n";
+		print "$app: activated $version\n";
 	 }
 	 # start service again
 	 $self->service_action($app, "start");
