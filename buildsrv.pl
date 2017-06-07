@@ -114,9 +114,19 @@ sub check_package {
 	my $package = shift; # contains full path
 	my $info_file = shift;
 	my $state = 0;
-    if(fgrep { /$package/ } $info_file) {
-		$state = 1;
-    }	
+
+	my @matches = fgrep { /$package/ } $info_file;
+	foreach (@matches) {
+	  if($_->{count} == 0 || $_->{count} > 1) {
+	    return 1;
+	  } else {
+		foreach my $l (keys %{$_->{matches}}) {
+		  my $hit = $_->{matches}->{$l};
+		  my ($t, $p) = split(" ", $hit);
+		  $state = $t;
+		}
+	  }
+	}
 	return $state;
 }
 
