@@ -6,6 +6,7 @@ use Getopt::Long;
 use Pod::Usage;
 use Config::Simple;
 use File::Slurp;
+use File::Grep qw(fgrep fmap fdo);
 use POSIX qw(strftime);
 use HTTP::Server::Brick;
 my $help = 0;
@@ -80,6 +81,7 @@ $srv->mount("/" => {
 		# the packages
 		if("$cc->{'path'}/$req->{path_info}" =~ /\.tar\.gz|\.tgz/) {
 		  if(-f "$cc->{'path'}/$req->{path_info}") {
+			my $state = check_package("$cc->{'path'}/$req->{path_info}", "$cc->{'path'}/.package_info") if (-f "$cc->{'path'}/.package_info");
 		    my $data = read_file("$cc->{'path'}/$req->{path_info}", { binmode => ':raw' });
 			$res->content($data);
 		  } else {
@@ -99,10 +101,24 @@ $srv->mount("/" => {
 	1;
   },
   wildcard => 1, # return all matches
-		   });
+});
 
 
 $srv->start;
+
+
+sub check_package {
+	# k = keep
+	# i = ignore
+	# f = failed
+	my $package = shift; # contains full path
+	my $info_file = shift;
+	my $state = 0;
+    if(fgrep { /$package/ } $info_file) {
+		$state = 1;
+    }	
+	return $state;
+}
 
 __END__
 
