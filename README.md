@@ -14,6 +14,8 @@ BUILDCTL
   - Log-Log4perl
   - HTML-Strip
   - Linux-Distribution
+  - File-Slurp
+  - File-Grep
 
 - Supports: Debian, CentOS, RedHat, Fedora
 ```
