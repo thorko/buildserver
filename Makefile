@@ -5,10 +5,10 @@ endif
 
 prepare:
 ifeq ($(_distro),Debian)
-	apt-get -y install libarchive-extract-perl libhttp-server-brick-perl libgetopt-long-descriptive-perl libconfig-simple-perl liblog-log4perl-perl libhtml-strip-perl liblinux-distribution-perl
+	apt-get -y install libarchive-extract-perl libhttp-server-brick-perl libgetopt-long-descriptive-perl libconfig-simple-perl liblog-log4perl-perl libhtml-strip-perl liblinux-distribution-perl libfile-slurp-perl
 endif
 ifeq ($(_distro),$(filter $(_distro), CentOS Fedora RedHat))
-	yum -y install perl-Archive-Extract perl-HTTP-Server-Brick perl-Getopt-Long-Descriptive perl-Config-Simple perl-Log-Log4perl perl-HTML-Strip perl-Linux-Distribution
+	yum -y install perl-Archive-Extract perl-HTTP-Server-Brick perl-Getopt-Long-Descriptive perl-Config-Simple perl-Log-Log4perl perl-HTML-Strip perl-Linux-Distribution perl-File-Slurp
 endif
 
 install:
