@@ -12,7 +12,7 @@ use Switch;
 my $help = 0;
 my $debug = 0;
 my $force = 0;
-my ($config, $command, $app, $version, $build_file, $path) = ("", "", "", "", "");
+my ($config, $command, $app, $version, $build_file, $path, $mark) = ("", "", "", "", "", "");
 
 Getopt::Long::Configure('bundling');
 GetOptions(
@@ -22,6 +22,7 @@ GetOptions(
   "r|command=s"  => \$command,
   "a|app=s"      => \$app,
   "f|force"      => \$force,
+  "m|mark=s"     => \$mark,
   "v|version=s"  => \$version,
   "b|build-file=s" => \$build_file,
   "p|path=s"       => \$path,
@@ -34,6 +35,7 @@ pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } 
 pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  if ($command eq "build" && $build_file eq "");
 pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  if ($command eq "pack" && ($app eq "" ||  $version eq ""));
 pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  if ($command eq "update" && $build_file eq "");
+pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  if ($command eq "mark" && ($app eq "" ||  $version eq "" || $mark eq ""));
 
 $config = defined($config) && $config ne "" ? $config : "/etc/buildctl/buildctl.conf";
 
@@ -51,6 +53,7 @@ switch ($command) {
 	case "build" { $buildctl->build($build_file) }
     case "pack" { $buildctl->pack($app, $version) }
 	case "update" { $buildctl->update($build_file) }
+	case "mark" { $buildctl->mark($app, $version, $mark) }
 	else { pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  }
 }
 
@@ -121,3 +124,7 @@ requires --app, --version: will pack the app in version and move it to path
 =item B<update>
 
 requires --build-file: will build app and packing it
+
+=item B<mark>
+
+requires --app, --version, --mark: will mark the app in repository (alllowed: k = keep, i = ignore, f = failed)

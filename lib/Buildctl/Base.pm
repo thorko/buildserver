@@ -10,6 +10,8 @@ use LWP::UserAgent;
 use Switch;
 use version;
 use Archive::Extract;
+use File::Slurp qw( append_file edit_file_lines );
+use File::Grep qw(fgrep);
 use Linux::Distribution qw(distribution_name distribution_version);
 
 our @EXPORT = qw( list_versions service_action switch_version get_active repository install delete pack rep_var build_script );
@@ -429,6 +431,36 @@ sub pack {
     print "OK\n";
 	return 0;
   }
+}
+
+sub mark {
+   my $self = shift;
+   my $app = shift;
+   my $version = shift;
+   my $mark = shift;
+   my $config = $self->{config};
+   my $logger = $self->{logger};
+   my $package_info = "$config->{repository}/.package_info";
+
+
+   if($mark !~ /k|f|i/) {
+     $logger->error("Bad mark option $mark");
+	 print "ERROR: Only k, f, i are allowed\n";
+	 return 1;
+   }
+
+   my @matches = fgrep { /$config->{repository}\/$app\/$app-$version.tar.gz/ } $package_info;
+   foreach (@matches) {
+     if($_->{count} > 0) {
+       edit_file_lines { $_ = "$mark $config->{repository}/$app/$app-$version.tar.gz" if /$app-$version\.tar\.gz/ } $package_info;
+	   $logger->info("Marked $config->{repository}/$app/$app-$version.tar.gz as $mark");
+       print "Marked $config->{repository}/$app/$app-$version.tar.gz as $mark\n";
+	 } else {
+	   append_file($package_info, "$mark $config->{repository}/$app/$app-$version.tar.gz");
+	   $logger->info("Marked $config->{repository}/$app/$app-$version.tar.gz as $mark");
+	   print "Marked $config->{repository}/$app/$app-$version.tar.gz as $mark\n";
+	 }
+   }
 }
 
 # function to expand macros in variable
