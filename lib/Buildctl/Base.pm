@@ -20,6 +20,7 @@ sub new {
 
 	my $config = $args{config};
 	my $debug = $args{debug} // 0;
+	my $force = $args{force};
 
 	my @apps;
 	my $cfg = new Config::Simple();
@@ -54,6 +55,7 @@ sub new {
 	Log::Log4perl->init(\$log_conf);
 	$self->{logger} = Log::Log4perl->get_logger();
 	$self->{config} = $cfg->get_block("config");
+	$self->{config}->{'force'} = $force;
 
 	# read apps
 	my $a = $cfg->get_block("apps");
@@ -332,6 +334,14 @@ sub install {
        print "ERROR: $app-$version.tar.gz not available in repository\n";
        return 1;
      }
+	 # only if force disabled and in config package_status is set 1
+	 if($config->{'force'} == 0 && $rep->{'package_status'} == 1) {
+	    if($r->{_headers}->{packagestatus} =~ /k|i|f/) {
+			$logger->warn("/$app/$app-$version.tar.gz is set to $r->{_headers}->{packagestatus}");
+			print "/$app/$app-$version.tar.gz is set to $r->{_headers}->{packagestatus}\n";
+			return 1;
+		}
+	 }
 	 $logger->debug("result: $r->{_msg}");
      $logger->info("installing $app-$version.tar.gz");
      print "installing: $app-$version.tar.gz\n";

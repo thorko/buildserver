@@ -11,6 +11,7 @@ use POSIX qw(strftime);
 use Switch;
 my $help = 0;
 my $debug = 0;
+my $force = 0;
 my ($config, $command, $app, $version, $build_file, $path) = ("", "", "", "", "");
 
 Getopt::Long::Configure('bundling');
@@ -20,6 +21,7 @@ GetOptions(
   "d|debug"      => \$debug,
   "r|command=s"  => \$command,
   "a|app=s"      => \$app,
+  "f|force"      => \$force,
   "v|version=s"  => \$version,
   "b|build-file=s" => \$build_file,
   "p|path=s"       => \$path,
@@ -36,7 +38,7 @@ pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } 
 $config = defined($config) && $config ne "" ? $config : "/etc/buildctl/buildctl.conf";
 
 # use module
-my $buildctl = Buildctl::Base->new(config => $config, debug => $debug);
+my $buildctl = Buildctl::Base->new(config => $config, debug => $debug, force => $force);
 
 my $exit = 0;
 switch ($command) {
