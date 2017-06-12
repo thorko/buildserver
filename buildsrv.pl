@@ -140,7 +140,7 @@ sub check_package {
 	}
 	return $state if ($state ne "0");
 	# check if there is a package pinned (keep);
-	my ($name, $version) = $package =~ /([a-z\-]*)-([0-9\.]+)\.tar\.gz$/;
+	my ($name, $version) = $package =~ /([a-z\-]*)-([0-9a-z\.]+)\.tar\.gz$/;
 	@matches = fgrep { /$name/ } $info_file;
 	foreach (@matches) {
 	  if($_->{count} == 0 ) {
