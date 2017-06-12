@@ -26,9 +26,12 @@ like(qx/$tool -r repository -a nginx/, qr/nginx-1.12.0.tar.gz/, 'show repository
 # stop repository server
 
 # install nginx
-like(qx/$tool -r install -a nginx -v 1.12.0/, qr{/nginx/nginx-1.12.0.tar.gz is set to k}, 'try to install nginx');
+like(qx/$tool -r install -a nginx -v 1.12.0/, qr{/nginx/nginx-1.12.0.tar.gz is set to i}, 'try to install nginx');
 like(qx/$tool -r install -a nginx -v 1.12.0 -f/, qr/Success/, 'install nginx');
 like(qx/$tool -r install -a mailsrv -v 1.12.0/, qr/ERROR: mailsrv-1.12.0.tar.gz not available in repository/, 'app not available in repository');
+
+like(qx/$tool -r install -a apache -v 1.13.0 /, qr{tests/repository/apache/apache-1.12.0.tar.gz is set to keep}, 'test pinned package apache - error');
+like(qx/$tool -r install -a apache -v 1.12.0 /, qr{tests/repository/apache/apache-1.12.0.tar.gz is set to keep}, 'test pinned package apache - install');
 
 # test latest
 like(qx/$tool -r install -a nginx -v latest -f/, qr/Success/, 'install latest nginx');

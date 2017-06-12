@@ -81,10 +81,13 @@ $srv->mount("/" => {
 		# the packages
 		if("$cc->{'path'}/$req->{path_info}" =~ /\.tar\.gz|\.tgz/) {
 		  if(-f "$cc->{'path'}/$req->{path_info}") {
-			my $state = check_package("$cc->{'path'}$req->{path_info}", "$cc->{'path'}/.package_info") if (-f "$cc->{'path'}/.package_info");
+			my $state = 0;
+			my $package = "";
+			($state, $package) = check_package("$cc->{'path'}$req->{path_info}", "$cc->{'path'}/.package_info") if (-f "$cc->{'path'}/.package_info");
 		    my $data = read_file("$cc->{'path'}/$req->{path_info}", { binmode => ':raw' });
 			$ll->info("Download Package: $req->{path_info}: $state");
 			$res->push_header(packagestatus => $state);
+			$res->push_header(package => $package) if (defined $package && $package ne "");
 			$res->content($data);
 		  } else {
 			$res->code(404);
@@ -117,7 +120,28 @@ sub check_package {
 	my $info_file = shift;
 	my $state = 0;
 
+	# check first if there is a package entry
 	my @matches = fgrep { /$package/ } $info_file;
+	foreach (@matches) {
+	  if ($_->{count} > 1) {
+		return 1;
+	  } else {
+		foreach my $l (keys %{$_->{matches}}) {
+		  my $hit = $_->{matches}->{$l};
+		  my ($t, $p) = split(" ", $hit);
+		  # if excact package name is set to keep return 0
+		  if($t eq "k") {
+			$state = 0;
+		  } else {
+		    $state = $t;
+		  }
+		}
+	  }
+	}
+	return $state if ($state ne "0");
+	# check if there is a package pinned (keep);
+	my ($name, $version) = $package =~ /([a-z\-]*)-([0-9\.]+)\.tar\.gz$/;
+	@matches = fgrep { /$name/ } $info_file;
 	foreach (@matches) {
 	  if($_->{count} == 0 ) {
 	    return 0;
@@ -128,10 +152,11 @@ sub check_package {
 		  my $hit = $_->{matches}->{$l};
 		  my ($t, $p) = split(" ", $hit);
 		  $state = $t;
+		  return ($state, $p);
 		}
 	  }
 	}
-	return $state;
+	return 0;
 }
 
 __END__

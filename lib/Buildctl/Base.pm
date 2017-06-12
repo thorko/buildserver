@@ -336,9 +336,14 @@ sub install {
      }
 	 # only if force disabled and in config package_status is set 1
 	 if($config->{'force'} == 0 && $rep->{'package_status'} == 1) {
-	    if($r->{_headers}->{packagestatus} =~ /k|i|f/) {
+	    if($r->{_headers}->{packagestatus} =~ /i|f/) {
 			$logger->warn("/$app/$app-$version.tar.gz is set to $r->{_headers}->{packagestatus}");
 			print "/$app/$app-$version.tar.gz is set to $r->{_headers}->{packagestatus}\n";
+			return 1;
+		} elsif($r->{_headers}->{packagestatus} eq "k") {
+			# another package is set to keep
+			$logger->warn("$r->{_headers}->{package} is set to keep");
+			print "$r->{_headers}->{package} is set to keep\n";
 			return 1;
 		}
 	 }

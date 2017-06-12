@@ -1,7 +1,6 @@
 # k = keep package
 # i = ignore package
 # f = failed package
-k tests/repository/nginx/nginx-1.12.0.tar.gz
-i apache-1.12.0.tar.gz
-f tool-1.1.tar.gz
+i tests/repository/nginx/nginx-1.12.0.tar.gz
+k tests/repository/apache/apache-1.12.0.tar.gz
 
