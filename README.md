@@ -170,3 +170,13 @@ Afterwards you can switch to it
 buildctl -a bind -r list-versions
 buildctl -a bind -v 9.10.4-P6 -r switch-version
 ```
+
+### Pin a package in repository
+The allowed options are
+k = keep package
+i = ignore package
+f = failed package
+This will keep the package apache 2.2.24
+```
+buildctl -r mark -a apache -v 2.2.24 -m k
+```

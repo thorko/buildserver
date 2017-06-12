@@ -127,4 +127,4 @@ requires --build-file: will build app and packing it
 
 =item B<mark>
 
-requires --app, --version, --mark: will mark the app in repository (alllowed: k = keep, i = ignore, f = failed)
+requires --app, --version, --mark: will mark the app in repository (allowed: k = keep, i = ignore, f = failed)
