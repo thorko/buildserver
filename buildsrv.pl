@@ -81,8 +81,10 @@ $srv->mount("/" => {
 		# the packages
 		if("$cc->{'path'}/$req->{path_info}" =~ /\.tar\.gz|\.tgz/) {
 		  if(-f "$cc->{'path'}/$req->{path_info}") {
-			my $state = check_package("$cc->{'path'}/$req->{path_info}", "$cc->{'path'}/.package_info") if (-f "$cc->{'path'}/.package_info");
+			my $state = check_package("$cc->{'path'}$req->{path_info}", "$cc->{'path'}/.package_info") if (-f "$cc->{'path'}/.package_info");
 		    my $data = read_file("$cc->{'path'}/$req->{path_info}", { binmode => ':raw' });
+			$ll->info("Download Package: $req->{path_info}: $state");
+			$res->push_header(packagestatus => $state);
 			$res->content($data);
 		  } else {
 			$res->code(404);
@@ -117,8 +119,10 @@ sub check_package {
 
 	my @matches = fgrep { /$package/ } $info_file;
 	foreach (@matches) {
-	  if($_->{count} == 0 || $_->{count} > 1) {
-	    return 1;
+	  if($_->{count} == 0 ) {
+	    return 0;
+	  } elsif ($_->{count} > 1) {
+		return 1;
 	  } else {
 		foreach my $l (keys %{$_->{matches}}) {
 		  my $hit = $_->{matches}->{$l};
