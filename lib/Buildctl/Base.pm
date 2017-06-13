@@ -475,11 +475,11 @@ sub mark {
    my @matches = fgrep { /$config->{repository}\/$app\/$app-$version.tar.gz/ } $package_info;
    foreach (@matches) {
      if($_->{count} > 0) {
-       edit_file_lines { $_ = "$mark $config->{repository}/$app/$app-$version.tar.gz" if /$app-$version\.tar\.gz/ } $package_info;
+       edit_file_lines { $_ = "$mark $config->{repository}/$app/$app-$version.tar.gz\n" if /$app-$version\.tar\.gz/ } $package_info;
 	   $logger->info("Marked $config->{repository}/$app/$app-$version.tar.gz as $mark");
        print "Marked $config->{repository}/$app/$app-$version.tar.gz as $mark\n";
 	 } else {
-	   append_file($package_info, "$mark $config->{repository}/$app/$app-$version.tar.gz");
+	   append_file($package_info, "$mark $config->{repository}/$app/$app-$version.tar.gz\n");
 	   $logger->info("Marked $config->{repository}/$app/$app-$version.tar.gz as $mark");
 	   print "Marked $config->{repository}/$app/$app-$version.tar.gz as $mark\n";
 	 }
