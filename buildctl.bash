@@ -2,7 +2,8 @@ _buildctl() {
    local cur prev
    COMPREPLY=()
 
-   COMMANDS="list-versions get-active repository switch-version install delete build pack update"
+   COMMANDS="list get-active repository switch-version install delete build pack update mark"
+   SUBCOMMANDS="version package_state"
    APPS="apache2 bind php5 postfix dovecot mariadb sqlgrey kerberos subversion modsecurity clamav zabbix zabbix-agent openssl nginx"
 
    cur=${COMP_WORDS[COMP_CWORD]}
@@ -30,17 +31,21 @@ _buildctl() {
           COMPREPLY=( $(compgen -W '$(ls --color=never /usr/local/$selected/ | grep -v current)' -- $cur) );
           ;;
         "-b")
-	        _filedir;
-	        return 0;
-	        ;;
+	      _filedir;
+	      return 0;
+	      ;;
         "-p")
-	        _filedir;
-	        return 0;
+	      _filedir;
+	      return 0;
           ;;
         "--path")
           _filedir;
-          return 0
+          return 0;
           ;;
+		"-o")
+		  COMPREPLY=( $(compgen -W '$SUBCOMMANDS' -- $cur) );
+		  return 0;
+		  ;;
    esac
 }
 

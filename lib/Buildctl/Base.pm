@@ -10,11 +10,13 @@ use LWP::UserAgent;
 use Switch;
 use version;
 use Archive::Extract;
-use File::Slurp qw( append_file edit_file_lines );
+use File::Slurp qw( append_file edit_file_lines read_file );
 use File::Grep qw(fgrep);
 use Linux::Distribution qw(distribution_name distribution_version);
 
 our @EXPORT = qw( list_versions service_action switch_version get_active repository install delete pack rep_var build_script );
+
+our $package_states = { k => "keep", i => "ignore", f => "failed" };
 
 sub new {
 	my ($class, %args) = @_;
@@ -58,6 +60,8 @@ sub new {
 	$self->{logger} = Log::Log4perl->get_logger();
 	$self->{config} = $cfg->get_block("config");
 	$self->{config}->{'force'} = $force;
+	# it's hardcoded
+	$self->{config}->{'package_file'} = "$self->{config}->{repository}/.package_info";
 
 	# read apps
 	my $a = $cfg->get_block("apps");
@@ -433,6 +437,25 @@ sub pack {
   }
 }
 
+sub list_package_state {
+  my $self = shift;
+  my $config = $self->{config};
+  my $package_info = $config->{'package_file'};
+
+  if( ! -f $package_info) {
+	print "No package_info file: Nothing is marked!\n";
+	return 0;
+  }
+  my $lines = read_file($package_info, array_ref => 1);
+  foreach (@$lines) {
+	# ignore comments
+	next if($_ =~ /^#/ );
+	my ($state, $package) = split(" ", $_);
+	print "$package\t$package_states->{$state}\n";
+  }
+  return 0;
+}
+
 sub mark {
    my $self = shift;
    my $app = shift;
@@ -440,7 +463,7 @@ sub mark {
    my $mark = shift;
    my $config = $self->{config};
    my $logger = $self->{logger};
-   my $package_info = "$config->{repository}/.package_info";
+   my $package_info = $config->{'package_file'};
 
 
    if($mark !~ /k|f|i/) {

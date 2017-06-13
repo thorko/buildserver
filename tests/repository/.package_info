@@ -3,3 +3,4 @@
 # f = failed package
 i tests/repository/nginx/nginx-1.12.0.tar.gz
 k tests/repository/apache/apache-1.12.0.tar.gz
+k tests/repository/openssl/openssl-1.0.2l.tar.gz

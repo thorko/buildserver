@@ -17,13 +17,13 @@ my $tool = "$^X $opt $Bin/../buildctl.pl $cfgopt";
 
 my $srv = "$^X $opt $Bin/../buildsrv.pl -c tests/buildsrv.conf";
 
-like(qx/$tool -h/, qr/list all versions of applications/, 'check help message');
+like(qx/$tool -h/, qr/requires: --option/, 'check help message');
 like(qx/$tool -r help/, qr/use build file to install app/, 'check pod2usage');
 
 # list-versions
-like(qx/$tool -r list-versions/, qr/php5:  0.0.1  0.0.2/, 'list application versions');
+like(qx/$tool -r list -o version/, qr/php5:  0.0.1  0.0.2/, 'list application versions');
 # list-version of app
-like(qx/$tool -r list-versions -a apache2/, qr/apache2:  1.2.0  1.2.1/, 'list version of app apache2');
+like(qx/$tool -r list -o version -a apache2/, qr/apache2:  1.2.0  1.2.1/, 'list version of app apache2');
 
 # get-active
 like(qx/$tool -r get-active/, qr/apache2: 1.2.0/, 'get active version');

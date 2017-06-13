@@ -79,7 +79,7 @@ buildctl -r build -b /etc/buildctl/apps/dovecot.conf
 ```
 To list all available versions of apps
 ```
-buildctl -r list-versions
+buildctl -r list -o version
 ```
 Get active version of app
 ```
@@ -167,7 +167,7 @@ the **install_path** setting in **/etc/buildctl/buildctl.conf**
 
 Afterwards you can switch to it
 ```
-buildctl -a bind -r list-versions
+buildctl -a bind -r list -o version
 buildctl -a bind -v 9.10.4-P6 -r switch-version
 ```
 
@@ -175,8 +175,12 @@ buildctl -a bind -v 9.10.4-P6 -r switch-version
 The allowed options are
 k = keep package
 i = ignore package
-f = failed package
+f = failed package  
 This will keep the package apache 2.2.24
 ```
 buildctl -r mark -a apache -v 2.2.24 -m k
+```
+List all marked packages
+```
+buildctl -r list -o package_state
 ```

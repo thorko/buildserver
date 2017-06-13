@@ -23,7 +23,12 @@ my $pid = qx($srv > /dev/null 2>&1 & echo \$!);
 
 like(qx/$tool -r repository/, qr/nginx/, 'get repository');
 like(qx/$tool -r repository -a nginx/, qr/nginx-1.12.0.tar.gz/, 'show repository');
-# stop repository server
+
+# mark package
+like(qx/$tool -r mark -a openssl -v 1.0.2l -m k/, qr{Marked tests/repository/openssl/openssl-1.0.2l.tar.gz as k}, 'mark package openssl');
+
+# list package state
+like(qx/$tool -r list -o package_state/, qr{tests/repository/openssl/openssl-1.0.2l.tar.gz\tkeep}, 'list marked packages');
 
 # install nginx
 like(qx/$tool -r install -a nginx -v 1.12.0/, qr{/nginx/nginx-1.12.0.tar.gz is set to i}, 'try to install nginx');

@@ -12,7 +12,7 @@ use Switch;
 my $help = 0;
 my $debug = 0;
 my $force = 0;
-my ($config, $command, $app, $version, $build_file, $path, $mark) = ("", "", "", "", "", "");
+my ($config, $command, $app, $version, $build_file, $path, $mark, $option) = ("", "", "", "", "", "", "");
 
 Getopt::Long::Configure('bundling');
 GetOptions(
@@ -23,6 +23,7 @@ GetOptions(
   "a|app=s"      => \$app,
   "f|force"      => \$force,
   "m|mark=s"     => \$mark,
+  "o|option=s"   => \$option,
   "v|version=s"  => \$version,
   "b|build-file=s" => \$build_file,
   "p|path=s"       => \$path,
@@ -30,6 +31,7 @@ GetOptions(
 
 pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  if ($command eq "");
 pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  if ($command eq "activate" && ($app eq "" || $version eq ""));
+pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  if ($command eq "list" && $option eq "");
 pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  if ($command eq "install" && ($app eq "" || $version eq ""));
 pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  if ($command eq "delete" && ($app eq "" || $version eq ""));
 pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  if ($command eq "build" && $build_file eq "");
@@ -44,7 +46,13 @@ my $buildctl = Buildctl::Base->new(config => $config, debug => $debug, force => 
 
 my $exit = 0;
 switch ($command) {
-	case "list-versions" { $buildctl->list_versions($app) }
+	case "list" { 
+	  if ($option eq "version") {
+	    $buildctl->list_versions($app);
+	  } elsif ($option eq "package_state") {
+		$buildctl->list_package_state();
+	  }
+	}
 	case "get-active" { $buildctl->get_active($app) }
 	case "activate" { $buildctl->switch_version($app, $version) }
 	case "repository" { $buildctl->repository($app) }
@@ -89,9 +97,9 @@ use build file to install app
 
 =over
 
-=item B<list-versions>
+=item B<list>
 
-list all versions of applications
+requires: --option (version, package_state): will list version or package states
 
 =item B<get-active>
 
