@@ -277,11 +277,10 @@ sub repository {
       $logger->debug("Call: $url");
       $req = HTTP::Request->new(GET => $url);
       $raw = $ua->request($req)->content;
-	  #my $hs = HTML::Strip->new();
-	  #my $text = $hs->parse($raw);
-	  #$hs->eof;
       foreach (split("\n", $raw)) {
-        print "$_\n" if ($_ =~ /^$app.*/);
+		if($_ =~ /^$app.*/) {
+		    print "$_\n";
+		}
       }
    }
 }
@@ -305,7 +304,7 @@ sub get_latest {
     $hs->eof;
     foreach (split("\n", $text)) {
 	  if($_ =~ /^$app-/) {
-	    $_ =~ s/^$app-(.*)\.tar\.gz/$1/;
+	    $_ =~ s/^$app-(.*)\.tar\.gz.*/$1/;
 	    $version = $_ if(version->parse($_) > $version);
 	  }
     }
@@ -344,7 +343,7 @@ sub install {
 	 if($config->{'force'} == 0 && $rep->{'package_status'} == 1) {
 	    if($r->{_headers}->{packagestatus} =~ /i|f/) {
 			$logger->warn("/$app/$app-$version.tar.gz is set to $r->{_headers}->{packagestatus}");
-			print "/$app/$app-$version.tar.gz is set to $r->{_headers}->{packagestatus}\n";
+			print "/$app/$app-$version.tar.gz is set to $package_states->{$r->{_headers}->{packagestatus}}\n";
 			return 1;
 		} elsif($r->{_headers}->{packagestatus} eq "k") {
 			# another package is set to keep

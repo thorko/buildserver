@@ -22,7 +22,7 @@ my $srv = "$^X $opt $Bin/../buildsrv.pl -c tests/buildsrv.conf";
 my $pid = qx($srv > /dev/null 2>&1 & echo \$!);
 
 like(qx/$tool -r repository/, qr/nginx/, 'get repository');
-like(qx/$tool -r repository -a nginx/, qr/nginx-1.12.0.tar.gz/, 'show repository');
+like(qx/$tool -r repository -a nginx/, qr/nginx-1.12.0.tar.gz\tignore/, 'show repository');
 
 # mark package
 like(qx/$tool -r mark -a openssl -v 1.0.2l -m k/, qr{Marked tests/repository/openssl/openssl-1.0.2l.tar.gz as k}, 'mark package openssl');

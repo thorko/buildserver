@@ -24,6 +24,8 @@ pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } 
 
 $config = defined($config) && $config ne "" ? $config : "/etc/buildctl/buildsrv.conf";
 
+our $package_states = { k => "keep", i => "ignore", f => "failed" };
+
 my $cfg = new Config::Simple();
 $cfg->read($config);
 my $log = $cfg->get_block("log");
@@ -90,8 +92,20 @@ $srv->mount("/" => {
 		  }
 		# the directories
 		} elsif (-d "$cc->{'path'}/$req->{path_info}") {
-		  my $files = qx{ls $cc->{'path'}/$req->{path_info}};
-		  $res->content($files);
+		  my $content = "";
+		  my $lines = qx{ls $cc->{'path'}/$req->{path_info}};
+		  my @files = split("\n", $lines);
+		  foreach (@files) {
+			my $state = "";
+			my $package = "";
+		    ($state, $package) = check_package("$cc->{'path'}$req->{path_info}/$_", "$cc->{'path'}/.package_info") if (-f "$cc->{'path'}/.package_info");
+			if(defined($state) && $state =~ /k|i|f/) {
+		      $content .= "$_\t$package_states->{$state}\n";
+			} else {
+			  $content .= "$_\n";
+			}
+		  }
+		  $res->content($content);
 		# uri not found
 		} else {
 		  $res->code(404);
