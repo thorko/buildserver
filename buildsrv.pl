@@ -163,16 +163,12 @@ sub check_package {
 		foreach my $l (keys %{$_->{matches}}) {
 		  my $hit = $_->{matches}->{$l};
 		  my ($t, $p) = split(" ", $hit);
-		  # if excact package name is set to keep return 0
-		  if($t eq "k") {
-			$state = 0;
-		  } else {
-		    $state = $t;
-		  }
+		  # if excact package name is found return state
+		  return ($t, $p);
 		}
 	  }
 	}
-	return $state if ($state ne "0");
+	#return $state if ($state ne "0");
 	# check if there is a package pinned (keep);
 	my ($name, $version) = $package =~ /([a-z\-]*)-([0-9a-z\.]+)\.tar\.gz$/;
 	@matches = fgrep { /$name/ } $info_file;
