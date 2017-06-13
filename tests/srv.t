@@ -36,6 +36,7 @@ like(qx/$tool -r install -a nginx -v 1.12.0 -f/, qr/Success/, 'install nginx');
 like(qx/$tool -r install -a mailsrv -v 1.12.0/, qr/ERROR: mailsrv-1.12.0.tar.gz not available in repository/, 'app not available in repository');
 
 like(qx/$tool -r install -a apache -v 1.13.0 /, qr{tests/repository/apache/apache-1.12.0.tar.gz is set to keep}, 'test pinned package apache - error');
+like(qx/$tool -r install -a bind -v 9.10.4-P8/, qr{tests/repository/bind/bind-9.10.4-P6.tar.gz is set to keep}, 'test pinned package bind - error');
 like(qx/$tool -r install -a apache -v 1.12.0 /, qr{tests/repository/apache/apache-1.12.0.tar.gz is set to keep}, 'test pinned package apache - install');
 
 # test latest
