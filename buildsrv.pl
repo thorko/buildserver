@@ -98,7 +98,7 @@ $srv->mount("/" => {
 		  foreach (@files) {
 			my $state = "";
 			my $package = "";
-		    ($state, $package) = check_package("$cc->{'path'}$req->{path_info}/$_", "$cc->{'path'}/.package_info") if (-f "$cc->{'path'}/.package_info");
+		    ($state, $package) = get_package_info("$cc->{'path'}$req->{path_info}/$_", "$cc->{'path'}/.package_info") if (-f "$cc->{'path'}/.package_info");
 			if(defined($state) && $state =~ /k|i|f/) {
 		      $content .= "$_\t$package_states->{$state}\n";
 			} else {
@@ -119,6 +119,31 @@ $srv->mount("/" => {
 
 
 $srv->start;
+
+sub get_package_info {
+	my $package = shift;
+	my $info_file = shift;
+	my $state = 0;
+
+	# check first if there is a package entry
+	my @matches = fgrep { /$package/ } $info_file;
+	foreach (@matches) {
+	  if ($_->{count} > 1) {
+		return 1;
+	  } else {
+		foreach my $l (keys %{$_->{matches}}) {
+		  my $hit = $_->{matches}->{$l};
+		  my ($s, $p) = split(" ", $hit);
+		  # if excact package name is set to keep return 0
+		  if(defined($s)) {
+			return($s, $p);
+		  } else {
+		    return (0, $p);
+		  }
+		}
+	  }
+	}
+}
 
 
 sub check_package {
