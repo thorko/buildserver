@@ -9,6 +9,7 @@ use File::Slurp;
 use File::Grep qw(fgrep fmap fdo);
 use POSIX qw(strftime);
 use HTTP::Server::Brick;
+use Buildctl::Constants qw($package_states);
 my $help = 0;
 my $debug = 0;
 my ($config, $command, $app, $version) = ("", "", "", "");
@@ -23,8 +24,6 @@ GetOptions(
 pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  if ($help);
 
 $config = defined($config) && $config ne "" ? $config : "/etc/buildctl/buildsrv.conf";
-
-our $package_states = { k => "keep", i => "ignore", f => "failed" };
 
 my $cfg = new Config::Simple();
 $cfg->read($config);

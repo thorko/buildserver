@@ -23,7 +23,6 @@ my $srv = "$^X $opt $Bin/../buildsrv.pl -c tests/buildsrv.conf";
 # start server
 my $pid = qx($srv > /dev/null 2>&1 & echo \$!);
 
-
 like(qx/$tool -r repository/, qr/nginx/, 'get repository');
 like(qx/$tool -r repository -a nginx/, qr/nginx-1.12.0.tar.gz\tignore/, 'show repository');
 like(qx/$tool -r repository -a apache2/, qr/apache2-1.2.0.tar.gz/, 'show repository without marked packages');

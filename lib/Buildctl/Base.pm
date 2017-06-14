@@ -12,11 +12,8 @@ use version;
 use Archive::Extract;
 use File::Slurp qw( append_file edit_file_lines read_file );
 use File::Grep qw(fgrep);
+use Buildctl::Constants qw($package_states);
 use Linux::Distribution qw(distribution_name distribution_version);
-
-our @EXPORT = qw( list_versions service_action switch_version get_active repository install delete pack rep_var build_script );
-
-our $package_states = { k => "keep", i => "ignore", f => "failed" };
 
 sub new {
 	my ($class, %args) = @_;
