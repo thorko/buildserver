@@ -81,9 +81,12 @@ $srv->mount("/" => {
 			my $package = "";
 			($state, $package) = check_package("$cc->{'path'}$req->{path_info}", "$cc->{'path'}/.package_info") if (-f "$cc->{'path'}/.package_info");
 		    my $data = read_file("$cc->{'path'}/$req->{path_info}", { binmode => ':raw' });
-			$ll->info("Download Package: $req->{path_info}: $state");
-			$res->push_header(packagestatus => $state);
-			$res->push_header(package => $package) if (defined $package && $package ne "");
+
+      if(defined($state) && $state =~ /k|i|f/) {
+			  $ll->info("Download Package: $req->{path_info}: $state");
+			  $res->push_header(packagestatus => $state);
+			  $res->push_header(package => $package) if (defined $package && $package ne "");
+      }
 			$res->content($data);
 		  } else {
 			$res->code(404);
@@ -168,7 +171,8 @@ sub check_package {
 	  }
 	}
 	# check if there is a package pinned (keep);
-	my ($name, $version) = $package =~ /([a-z\-]*)-([0-9a-zA-Z\-\.]+)\.tar\.gz$/;
+	my ($name) = $package =~ /\/.*\/([a-zA-Z0-9\-]*).*\.gz$/;
+    $ll->debug("check for package $name");
 	@matches = fgrep { /$name/ } $info_file;
 	foreach (@matches) {
 	  if($_->{count} == 0 ) {
@@ -180,6 +184,7 @@ sub check_package {
 		  my $hit = $_->{matches}->{$l};
 		  my ($t, $p) = split(" ", $hit);
 		  $state = $t;
+          $ll->debug("Found: $name - $t, $p");
 		  return ($state, $p);
 		}
 	  }
