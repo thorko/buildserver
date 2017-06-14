@@ -468,6 +468,13 @@ sub mark {
 	 return 1;
    }
 
+   # if package file does not exist in repository
+   if(! -f "$config->{repository}/$app/$app-$version.tar.gz" ) {
+     $logger->error("Mark: $config->{repository}/$app/$app-$version.tar.gz is not in repository");
+	 print "ERROR: $config->{repository}/$app/$app-$version.tar.gz is not in repository\n";
+	 return 1;
+   }
+
    my @matches = fgrep { /$config->{repository}\/$app\/$app-$version.tar.gz/ } $package_info;
    foreach (@matches) {
      if($_->{count} > 0) {

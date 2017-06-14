@@ -34,24 +34,24 @@ my $out = qx{/usr/bin/curl -s -q $uri_404};
 like($out, qr/404 Not Found/, 'test 404 error code');
 
 # mark package
-like(qx/$tool -r mark -a openssl -v 1.0.2l -m k/, qr{Marked tests/repository/openssl/openssl-1.0.2l.tar.gz as keep}, 'mark package openssl');
+like(qx/$tool -r mark -a test -v 0.0.9 -m k/, qr{ERROR: tests/repository/test/test-0.0.9.tar.gz is not in repository}, 'mark nonexisting package');
+like(qx/$tool -r mark -a bind -v 9.10.4-P6 -m k/, qr{Marked tests/repository/bind/bind-9.10.4-P6.tar.gz as keep}, 'mark package bind');
 like(qx/$tool -r mark -a openssl -v 1.0.2l -m u/, qr{ERROR: Only k, f, i are allowed}, 'mark package openssl with u');
-like(qx/$tool -r mark -a apache2 -v 0.0.9 -m k/, qr{Marked tests/repository/apache2/apache2-0.0.9.tar.gz as keep}, 'mark package test with k');
+like(qx/$tool -r mark -a apache -v 1.13.0 -m k/, qr{Marked tests/repository/apache/apache-1.13.0.tar.gz as keep}, 'mark package test with k');
 # cleanup
-edit_file_lines { $_ = "" if /k tests\/repository\/apache2\/apache2-0.0.9.tar.gz/ } $package_file;
+edit_file_lines { $_ = "" if /k tests\/repository\/apache\/apache-1.13.0.tar.gz/ } $package_file;
 
 
 # list package state
 like(qx/$tool -r list -o package_state/, qr{tests/repository/openssl/openssl-1.0.2l.tar.gz\tkeep}, 'list marked packages');
 
 # install nginx
-like(qx/$tool -r install -a nginx -v 1.12.0/, qr{/nginx/nginx-1.12.0.tar.gz is set to i}, 'try to install nginx');
+like(qx/$tool -r install -a nginx -v 1.12.0/, qr{/nginx/nginx-1.12.0.tar.gz is set to ignore}, 'try to install nginx');
 like(qx/$tool -r install -a nginx -v 1.12.0 -f/, qr/Success/, 'install nginx');
 like(qx/$tool -r install -a mailsrv -v 1.12.0/, qr/ERROR: mailsrv-1.12.0.tar.gz not available in repository/, 'app not available in repository');
 
 like(qx/$tool -r install -a apache -v 1.13.0 /, qr{tests/repository/apache/apache-1.12.0.tar.gz is set to keep}, 'test pinned package apache - error');
 like(qx/$tool -r install -a bind -v 9.10.4-P8/, qr{tests/repository/bind/bind-9.10.4-P6.tar.gz is set to keep}, 'test pinned package bind - error');
-like(qx/$tool -r install -a apache -v 1.12.0 /, qr{tests/repository/apache/apache-1.12.0.tar.gz is set to keep}, 'test pinned package apache - install');
 
 # test latest
 like(qx/$tool -r install -a nginx -v latest -f/, qr/Success/, 'install latest nginx');
