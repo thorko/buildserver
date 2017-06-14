@@ -82,12 +82,15 @@ $srv->mount("/" => {
 			($state, $package) = check_package("$cc->{'path'}$req->{path_info}", "$cc->{'path'}/.package_info") if (-f "$cc->{'path'}/.package_info");
 		    my $data = read_file("$cc->{'path'}/$req->{path_info}", { binmode => ':raw' });
 
-      if(defined($state) && $state =~ /k|i|f/) {
-			  $ll->info("Download Package: $req->{path_info}: $state");
-			  $res->push_header(packagestatus => $state);
-			  $res->push_header(package => $package) if (defined $package && $package ne "");
-      }
-			$res->content($data);
+            if(defined($state) && $state =~ /k|i|f/) {
+              # send header not if k is set and requested package is the same
+			  if(($state =~ /i|f/) || ("$package" ne "$cc->{'path'}$req->{path_info}" && $state =~ "k") ) {
+			    $ll->info("Download Package: $req->{path_info}: $state");
+			    $res->push_header(packagestatus => $state);
+			    $res->push_header(package => $package) if (defined $package && $package ne "");
+			  } 
+            }
+	        $res->content($data);
 		  } else {
 			$res->code(404);
 		    $res->content("$cc->{'path'}/$req->{path_info} NOT FOUND");
@@ -171,8 +174,9 @@ sub check_package {
 	  }
 	}
 	# check if there is a package pinned (keep);
-	my ($name) = $package =~ /\/.*\/([a-zA-Z0-9\-]*).*\.gz$/;
-    $ll->debug("check for package $name");
+	my ($name) = $package =~ /\/.*\/([a-zA-Z0-9]*\-[a-zA-Z]*).*\.gz$/;
+    $name =~ s/-$//;
+	$ll->debug("checking package $name");
 	@matches = fgrep { /$name/ } $info_file;
 	foreach (@matches) {
 	  if($_->{count} == 0 ) {
@@ -183,8 +187,8 @@ sub check_package {
 		foreach my $l (keys %{$_->{matches}}) {
 		  my $hit = $_->{matches}->{$l};
 		  my ($t, $p) = split(" ", $hit);
+          $ll->debug("Found $name - $t, $p");
 		  $state = $t;
-          $ll->debug("Found: $name - $t, $p");
 		  return ($state, $p);
 		}
 	  }

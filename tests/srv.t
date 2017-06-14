@@ -52,6 +52,8 @@ like(qx/$tool -r install -a mailsrv -v 1.12.0/, qr/ERROR: mailsrv-1.12.0.tar.gz 
 
 like(qx/$tool -r install -a apache -v 1.13.0 /, qr{tests/repository/apache/apache-1.12.0.tar.gz is set to keep}, 'test pinned package apache - error');
 like(qx/$tool -r install -a bind -v 9.10.4-P8/, qr{tests/repository/bind/bind-9.10.4-P6.tar.gz is set to keep}, 'test pinned package bind - error');
+# install kept package
+like(qx/$tool -r install -a bind -v 9.10.4-P6/, qr{installing: bind-9.10.4-P6}, 'test kept package bind');
 
 # test latest
 like(qx/$tool -r install -a nginx -v latest -f/, qr/Success/, 'install latest nginx');
