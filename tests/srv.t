@@ -5,6 +5,7 @@ use lib 'lib';
 use Buildctl::Base;
 use Config::Simple;
 use File::Grep qw(fgrep);
+use File::Slurp qw(edit_file_lines);
 use Test::More;
 use FindBin qw($Bin);
 use strict;
@@ -13,6 +14,7 @@ use warnings;
 my $opt = "-Mlib=$Bin/../lib";
 my $config = "tests/buildctl.conf";
 my $cfgopt = "-c $config";
+my $package_file = "tests/repository/.package_info";
 my $tool = "$^X $opt $Bin/../buildctl.pl $cfgopt";
 
 my $uri_404 = "http://127.0.0.1:12355/t";
@@ -33,6 +35,11 @@ like($out, qr/404 Not Found/, 'test 404 error code');
 
 # mark package
 like(qx/$tool -r mark -a openssl -v 1.0.2l -m k/, qr{Marked tests/repository/openssl/openssl-1.0.2l.tar.gz as keep}, 'mark package openssl');
+like(qx/$tool -r mark -a openssl -v 1.0.2l -m u/, qr{ERROR: Only k, f, i are allowed}, 'mark package openssl with u');
+like(qx/$tool -r mark -a apache2 -v 0.0.9 -m k/, qr{Marked tests/repository/apache2/apache2-0.0.9.tar.gz as keep}, 'mark package test with k');
+# cleanup
+edit_file_lines { $_ = "" if /k tests\/repository\/apache2\/apache2-0.0.9.tar.gz/ } $package_file;
+
 
 # list package state
 like(qx/$tool -r list -o package_state/, qr{tests/repository/openssl/openssl-1.0.2l.tar.gz\tkeep}, 'list marked packages');
