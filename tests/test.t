@@ -76,5 +76,14 @@ ok((fgrep { /configure.*mariadb.5\.5\.56 --with/ } $scriptfile) == 1, 'found ver
 # clean up
 qx{rm -rf /tmp/test_mariadb};
 
+# test full build script expansion
+qx{$tool -r build -b tests/php.conf};
+$scriptfile = "/tmp/php7/php.sh";
+ok((fgrep { /touch \/tmp\/php7\/1.0.2l/ } $scriptfile) == 1, 'found openssl version in script');
+ok((fgrep { /echo \/usr\/local\/openssl\/1.0.2l/ } $scriptfile) == 1, 'found openssl version in script');
+
+# clean up
+qx{rm -rf /tmp/php7};
+
 
 done_testing();
