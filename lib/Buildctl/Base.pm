@@ -500,6 +500,8 @@ sub rep_var{
   my $logger = $self->{logger};
   my $a = "";
 
+  return "" if(not defined($var) or $var eq "");
+
   while($var =~ /%([a-z_]+)/g) {
     # if $var doesn't contain any variable prefix
     if(not defined($1)) {
