@@ -1,6 +1,6 @@
 #!/bin/bash
 
-wget %url -O %build_path/source.tar.gz
+wget --prefer-family=IPv4 %url -O %build_path/source.tar.gz
 if [ $? -ne 0 ]; then
   echo "download dovecot failed"
   exit 1
@@ -31,7 +31,7 @@ fi
 
 ln -s /etc/dovecot %install_path/etc
 
-wget %pigeonhole_url -O %build_path/pigeonhole.tar.gz
+wget --prefer-family=IPv4 %pigeonhole_url -O %build_path/pigeonhole.tar.gz
 if [ $? -ne 0 ]; then
   echo "download pigeonhole failed"
   exit 1
