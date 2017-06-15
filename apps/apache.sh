@@ -7,7 +7,7 @@ modsec_version="2.9.1"
 modsec_path="/usr/local/modsecurity/2.9.1"
 
 wget http://mirror.serversupportforum.de/apache/httpd/httpd-%version.tar.gz -O %build_path/source.tar.gz
-if [ $? -ne 1 ]; then
+if [ $? -ne 0 ]; then
   echo "Couldn't download"
   exit 1
 fi
