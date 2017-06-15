@@ -33,9 +33,8 @@ if [ $? -ne 0 ]; then
 	exit 1
 fi
 
-# compile php5
+# compile php7
 cd %build_path
-
 wget http://de2.php.net/get/php-$php_version.tar.bz2/from/this/mirror -O %build_path/php-$php_version.tar.bz2
 if [ $? -ne 0 ]; then
   echo "Couldn't download php-$php_version.tar.bz2"
@@ -60,6 +59,18 @@ fi
 make install
 if [ $? -ne 0 ]; then
 	echo "ERROR make install php failed..."
+	exit 1
+fi
+
+$php_path/bin/pear install Log
+if [ $? -ne 0 ]; then
+	echo "pear install Log failed"
+	exit 1
+fi
+
+$php_path/bin/pecl install geoip-1.1.1
+if [ $? -ne 0 ]; then
+	echo "pecl install GeoIP failed"
 	exit 1
 fi
 
