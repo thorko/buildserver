@@ -28,14 +28,13 @@ fi
 
 # compile php7
 cd %build_path
-wget http://de2.php.net/get/php-%php_version.tar.bz2/from/this/mirror -O %build_path/php-%php_version.tar.bz2
+wget %php_url -O %build_path/php-%php_version.tar.bz2
 if [ $? -ne 0 ]; then
   echo "Couldn't download php-%php_version.tar.bz2"
   exit 1
 fi
 tar -xjvf %build_path/php-%php_version.tar.bz2 -C %build_path/
 cd %build_path/php-%php_version
-#vim -c '%s/^\(\s*test.*recode_conflict.*\)/#\1/g' -c 'wq!' configure
 sed -i 's/^\(\s*test.*recode_conflict.*\)/#\1/g' configure
 sed -i 's/^\(\s*test.*recode_conflict.*\)/dnl \1/g' ext/recode/config9.m4
      
@@ -68,7 +67,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # compile subversion for mod_dav_svn
-wget http://artfiles.org/apache.org/subversion/subversion-%svn_version.tar.gz -O %build_path/svn-%svn_version.tar.gz
+wget %svn_url -O %build_path/svn-%svn_version.tar.gz
 if [ $? -ne 0 ]; then
   echo "Couldn't download subversion-%svn_version.tar.gz"
   exit 1
@@ -95,7 +94,7 @@ cp %build_path/subversion-%svn_version/subversion/mod_dav_svn/.libs/mod_dav_svn.
 cp %build_path/subversion-%svn_version/subversion/mod_authz_svn/.libs/mod_authz_svn.so %install_path/modules/
 
 # compile mod_security
-wget https://www.modsecurity.org/tarball/%modsec_version/modsecurity-%modsec_version.tar.gz -O %build_path/modsecurity-%modsec_version.tar.gz
+wget %modsec_url -O %build_path/modsecurity-%modsec_version.tar.gz
 tar -xzvf %build_path/modsecurity-%modsec_version.tar.gz -C %build_path/
 cd %build_path/modsecurity-%modsec_version
 
