@@ -36,7 +36,7 @@ fi
 # compile php5
 cd %build_path
 
-wget http://de2.php.net/get/php-$php_version.tar.bz2/from/de1.php.net/mirror -O %build_path/php-$php_version.tar.bz2
+wget http://de2.php.net/get/php-$php_version.tar.bz2/from/this/mirror -O %build_path/php-$php_version.tar.bz2
 if [ $? -ne 0 ]; then
   echo "Couldn't download php-$php_version.tar.bz2"
   exit 1
@@ -71,7 +71,7 @@ if [ $? -ne 0 ]; then
 fi
 tar -xzvf %build_path/svn-$svn_version.tar.gz -C %build_path/
 cd %build_path/subversion-$svn_version
-./configure --with-apxs=%install_path/bin/axps --prefix=$svn_path
+./configure --with-apxs=%install_path/bin/apxs --prefix=$svn_path
 if [ $? -ne 0 ]; then
 	echo "configure subversion failed..."
 	exit 1
