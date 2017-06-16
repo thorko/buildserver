@@ -718,12 +718,12 @@ sub extract_source {
   # cleanup old stuff
   qx{rm -rf $build_path};
   qx{mkdir -p $build_path};
-  print "Extract archive $tmpfile to $build_path: ";
+  print "Extract archive $tmpfile to $build_path:\t";
 
   my $ae = Archive::Extract->new(archive => $tmpfile, type => $archive_type);
   my $ok = $ae->extract(to => $build_path);
   if ($ok) {
-     print "OK\n";
+     print "[OK]\n";
      # get path of source
      my @p = glob "$build_path/*";
      $p[0] =~ s{.*/}{};
