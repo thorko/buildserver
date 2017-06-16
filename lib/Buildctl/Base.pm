@@ -329,7 +329,7 @@ sub install {
      }
      $logger->info("download $app-$version.tar.gz");
      $url = "http://$rep->{'server'}:$rep->{'port'}/$app/$app-$version.tar.gz";
-     printf("%50s", "download: $app-$version.tar.gz");
+     printf("%-50s", "download: $app-$version.tar.gz");
      my $r = $ua->get($url, ':content_file' => "/tmp/$app-$version.tar.gz");
      if($r->{'_rc'} != 200) {
        $logger->error("$app-$version.tar.gz not available in repository");
@@ -352,7 +352,7 @@ sub install {
 	 print "[OK]\n";
 	 $logger->debug("result: $r->{_msg}");
      $logger->info("installing $app-$version.tar.gz");
-     printf("%50s", "installing: $app-$version.tar.gz");
+     printf("%-50s", "installing: $app-$version.tar.gz");
 	 # make dest
 	 qx{mkdir -p $config->{'install_path'}/$app/$version};
 	 # extract app
