@@ -809,11 +809,19 @@ sub build {
      or $bb->{'install_path'} eq ""
      or not defined($bb->{'url'})
      or $bb->{'url'} eq ""
-     or not defined($bb->{'build_opts'})
-     or $bb->{'build_opts'} eq ""
+     or not defined($bb->{'app'})
+     or $bb->{'app'} eq ""
+     or not defined($bb->{'version'})
+     or $bb->{'version'} eq ""
     ) 
   {
 	print "ERROR: Missing mandatory config variable\n";
+	return 1;
+  }
+
+  if ((not defined($bb->{'build_script'}) or $bb->{'build_script'} eq "")
+	   and (not defined($bb->{'build_opts'}) or $bb->{'build_opts'} eq "") ) {
+	print "ERROR: Missing build_opts or build_script in config file\n";
 	return 1;
   }
 
