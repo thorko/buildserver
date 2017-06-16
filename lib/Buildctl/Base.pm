@@ -86,7 +86,7 @@ sub list_versions {
                 print "$config->{'install_path'}/$_ does not exist.\n";
             } else {
                 my @v = glob "$config->{'install_path'}/$_/[0-9].*";
-                print "$_: ";
+                printf("%-20s", "$_:");
                 foreach (@v) {
                     $_ =~ s{.*/}{};
                     print " $_ ";
@@ -97,7 +97,7 @@ sub list_versions {
     } else {
        $logger->debug("list version of $app");
        my @v = glob "$config->{'install_path'}/$app/[0-9].*";
-       print "$app: ";
+       printf("%-20s", "$app:");
        foreach (@v) {
             $_ =~ s{.*/}{};
             print " $_ ";
