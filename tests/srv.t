@@ -59,7 +59,7 @@ like(qx/$tool -r install -a bind -v 9.10.4-P6/, qr{installing: bind-9.10.4-P6}, 
 like(qx/$tool -r install -a nginx -v latest -f/, qr/installing: nginx-1.12.0.tar.gz.*OK/, 'install latest nginx');
 
 # delete nginx
-like(qx/$tool -r delete -a nginx -v 1.12.0/, qr/Success/, 'delete nginx');
+like(qx/$tool -r delete -a nginx -v 1.12.0/, qr/nginx: delete 1.12.0.*OK/, 'delete nginx');
 like(qx/$tool -r delete -a apache2 -v 1.2.0/, qr/ERROR: apache2: can't delete active version 1.2.0/, 'delete active version apache2');
 
 # cleanup

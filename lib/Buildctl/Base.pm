@@ -329,7 +329,7 @@ sub install {
      }
      $logger->info("download $app-$version.tar.gz");
      $url = "http://$rep->{'server'}:$rep->{'port'}/$app/$app-$version.tar.gz";
-     print "download: $app-$version.tar.gz\t";
+     printf("%50s", "download: $app-$version.tar.gz");
      my $r = $ua->get($url, ':content_file' => "/tmp/$app-$version.tar.gz");
      if($r->{'_rc'} != 200) {
        $logger->error("$app-$version.tar.gz not available in repository");
@@ -352,7 +352,7 @@ sub install {
 	 print "[OK]\n";
 	 $logger->debug("result: $r->{_msg}");
      $logger->info("installing $app-$version.tar.gz");
-     print "installing: $app-$version.tar.gz\t";
+     printf("%50s", "installing: $app-$version.tar.gz");
 	 # make dest
 	 qx{mkdir -p $config->{'install_path'}/$app/$version};
 	 # extract app
@@ -391,7 +391,7 @@ sub delete {
     return 0;
   } else {
     $logger->info("$app will delete version $version\n");
-    print "$app: delete $version\n";
+    print "$app: delete $version\t";
         qx{rm -rf  $config->{'install_path'}/$app/$version};
         my $exit = $? >> 8;
       if($exit != 0) {
@@ -399,7 +399,7 @@ sub delete {
       print "ERROR: $app: Couldn't delete $version\n";
       } else {
       $logger->info("$app: Deleted old version $version");
-      print "Success\n";
+      print "[OK]\n";
       }
   }
 }
@@ -582,7 +582,7 @@ sub configure {
   my $log = "configure.log";
 
   # run build
-  print "Configure:\t";
+  printf("%-20s", "Configure:");
   qx{cd $build_path/$source_dir && $build_opts > $build_path/$log 2>&1};
   my $exit = $? >> 8;
   if ($exit != 0) {
@@ -604,7 +604,7 @@ sub make {
   my $make_cmd = shift;
   my $log = "make.log";
   # run make
-  print "Make:\t\t";
+  printf("%-20s", "Make:");
   qx{cd $build_path/$source_dir && $make_cmd > $build_path/$log 2>&1};
   my $exit = $? >> 8;
   if ($exit != 0) {
@@ -659,7 +659,7 @@ sub make_install {
   my $install_cmd = shift;
   my $log = "install.log";
   # run make
-  print "Install:\t";
+  printf("%20s", "Install:");
   qx{cd $build_path/$source_dir && $install_cmd > $build_path/$log 2>&1};
   my $exit = $? >> 8;
   if ($exit != 0) {
