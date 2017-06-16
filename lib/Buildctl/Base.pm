@@ -659,7 +659,7 @@ sub make_install {
   my $install_cmd = shift;
   my $log = "install.log";
   # run make
-  printf("%20s", "Install:");
+  printf("%-20s", "Install:");
   qx{cd $build_path/$source_dir && $install_cmd > $build_path/$log 2>&1};
   my $exit = $? >> 8;
   if ($exit != 0) {
