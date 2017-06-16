@@ -329,7 +329,7 @@ sub install {
      }
      $logger->info("download $app-$version.tar.gz");
      $url = "http://$rep->{'server'}:$rep->{'port'}/$app/$app-$version.tar.gz";
-     print "download: $app-$version.tar.gz\n";
+     print "download: $app-$version.tar.gz\t";
      my $r = $ua->get($url, ':content_file' => "/tmp/$app-$version.tar.gz");
      if($r->{'_rc'} != 200) {
        $logger->error("$app-$version.tar.gz not available in repository");
@@ -349,9 +349,10 @@ sub install {
 			return 1;
 		}
 	 }
+	 print "[OK]\n";
 	 $logger->debug("result: $r->{_msg}");
      $logger->info("installing $app-$version.tar.gz");
-     print "installing: $app-$version.tar.gz\n";
+     print "installing: $app-$version.tar.gz\t";
 	 # make dest
 	 qx{mkdir -p $config->{'install_path'}/$app/$version};
 	 # extract app
@@ -363,7 +364,7 @@ sub install {
        return 1;
      } else {
        $logger->info("Success");
-       print "Success\n";
+       print "[OK]\n";
      } 
      unlink("/tmp/$app-$version.tar.gz");
    }
@@ -416,7 +417,7 @@ sub pack {
     return 1;
   }
 
-  print "Packaging $app $version: ";
+  print "Packaging $app $version:\t";
   if ( ! -d "$path/$app") {
     qx{mkdir -p $path/$app};
   }
@@ -428,7 +429,7 @@ sub pack {
 	return 1;
   } else {
 	$logger->info("packaging of $app $version: ok");
-    print "OK\n";
+    print "[OK]\n";
 	return 0;
   }
 }
@@ -558,14 +559,14 @@ sub build_script {
   close(NEW_FILE);
   qx{chmod +x $build_path/$script};
   # run build script
-  print "Run your build script $build_path/$script: ";
+  print "Run your build script $build_path/$script:\t";
   qx{$build_path/$script > $build_path/build.log 2>&1};
   my $exit = $? >> 8;
   if($exit != 0) {
     print "ERROR: check your build script and log $build_path/build.log\n";
     exit 1;
   } else {
-    print "OK\n";
+    print "[OK]\n";
     return 0;
   }
 }
@@ -581,14 +582,14 @@ sub configure {
   my $log = "configure.log";
 
   # run build
-  print "Configure: ";
+  print "Configure:\t";
   qx{cd $build_path/$source_dir && $build_opts > $build_path/$log 2>&1};
   my $exit = $? >> 8;
   if ($exit != 0) {
     print "ERROR: configure $build_opts failed\nCheck $build_path/$log\n";
     exit 1;
   } else {
-    print "OK\n";
+    print "[OK]\n";
     return 0;
   }
 }
@@ -603,14 +604,14 @@ sub make {
   my $make_cmd = shift;
   my $log = "make.log";
   # run make
-  print "Make: ";
+  print "Make:\t\t";
   qx{cd $build_path/$source_dir && $make_cmd > $build_path/$log 2>&1};
   my $exit = $? >> 8;
   if ($exit != 0) {
     print "ERROR: $make_cmd failed\nCheck $build_path/$log\n";
     exit 1;
   } else {
-    print "OK\n";
+    print "[OK]\n";
     return 0;
   }
 }
@@ -658,14 +659,14 @@ sub make_install {
   my $install_cmd = shift;
   my $log = "install.log";
   # run make
-  print "Install: ";
+  print "Install:\t";
   qx{cd $build_path/$source_dir && $install_cmd > $build_path/$log 2>&1};
   my $exit = $? >> 8;
   if ($exit != 0) {
     print "ERROR: $install_cmd failed\nCheck $build_path/$log\n";
     exit 1;
   } else {
-    print "OK\n";
+    print "[OK]\n";
     return 0;
   }
 }
@@ -677,7 +678,7 @@ sub pre_post_action {
   my $build_path = shift;
   my $logger = $self->{logger};
 
-  print "Running $type command: ";
+  print "Running $type command:\t";
   qx{cd $build_path && $command > $build_path/$type.log 2>&1};
   my $rc = $? >> 8;
   if ($rc != 0 ) {
@@ -685,7 +686,7 @@ sub pre_post_action {
     print "ERROR: build command $command failed, check log $build_path/$type.log\n";
     exit 1;
   }
-  print "OK\n";
+  print "[OK]\n";
   return 0;
 }
 
@@ -739,7 +740,7 @@ sub download {
   my $tmp = shift;
   my $logger = $self->{logger};
   my $timeout = 120;
-  print "Will download $url: ";
+  print "Will download $url:\t";
   qx{wget -O $tmp --timeout=$timeout --quiet --prefer-family=IPv4 $url};
   my $exit = $? >> 8;
   if($exit != 0) {
@@ -747,7 +748,7 @@ sub download {
     print "ERROR: $url couldn't be downloaded\n";
     return 1;
   } else { 
-    print "OK\n";
+    print "[OK]\n";
     return 0;
   }
 }

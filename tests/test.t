@@ -35,7 +35,7 @@ like(qx/$tool -r activate -a apache2 -v 1.2.0/, qr/apache2: activated 1.2.0/, 's
 like(qx/$tool -r activate -a apache2 -v 1.2.0/, qr/WARN: start-stop script couldn't be found/, 'check warning of service action');
 
 # pack an app
-like(qx/$tool -r pack -a apache2 -v 1.2.1/, qr/Packaging apache2 1.2.1: OK/, 'pack app apache2');
+like(qx/$tool -r pack -a apache2 -v 1.2.1/, qr/Packaging apache2 1.2.1:\t\[OK\]/, 'pack app apache2');
 qx{rm -f /tmp/apache2/apache2-1.2.1.tar.gz};
 
 # update an app
@@ -69,7 +69,7 @@ is($b->pack("apache2", ""), 1, "pack - required options missing");
 is($b->pack("apache2", "1.2.0"), 0, "pack - couldn't pack");
 
 # test build script expansion
-like(qx{$tool -r build -b tests/mariadb.conf}, qr{Run your build script /tmp/test_mariadb/mariadb.sh: ERROR: check your build script and log /tmp/test_mariadb/build.log}, 'create build script');
+like(qx{$tool -r build -b tests/mariadb.conf}, qr{Run your build script /tmp/test_mariadb/mariadb.sh:\tERROR: check your build script and log /tmp/test_mariadb/build.log}, 'create build script');
 my $scriptfile = "/tmp/test_mariadb/mariadb.sh";
 ok((fgrep { /https.*mariadb-5\.5\.56\.tar\.gz/ } $scriptfile) == 1, 'found version in url');
 ok((fgrep { /configure.*mariadb.5\.5\.56 --with/ } $scriptfile) == 1, 'found version in configure line');

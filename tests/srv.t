@@ -47,7 +47,7 @@ like(qx/$tool -r list -o package_state/, qr{tests/repository/openssl/openssl-1.0
 
 # install nginx
 like(qx/$tool -r install -a nginx -v 1.12.0/, qr{/nginx/nginx-1.12.0.tar.gz is set to ignore}, 'try to install nginx');
-like(qx/$tool -r install -a nginx -v 1.12.0 -f/, qr/Success/, 'install nginx');
+like(qx/$tool -r install -a nginx -v 1.12.0 -f/, qr/installing: nginx-1.12.0.tar.gz.*OK/, 'install nginx');
 like(qx/$tool -r install -a mailsrv -v 1.12.0/, qr/ERROR: mailsrv-1.12.0.tar.gz not available in repository/, 'app not available in repository');
 
 like(qx/$tool -r install -a apache -v 1.13.0 /, qr{tests/repository/apache/apache-1.12.0.tar.gz is set to keep}, 'test pinned package apache - error');
@@ -56,7 +56,7 @@ like(qx/$tool -r install -a bind -v 9.10.4-P8/, qr{tests/repository/bind/bind-9.
 like(qx/$tool -r install -a bind -v 9.10.4-P6/, qr{installing: bind-9.10.4-P6}, 'test kept package bind');
 
 # test latest
-like(qx/$tool -r install -a nginx -v latest -f/, qr/Success/, 'install latest nginx');
+like(qx/$tool -r install -a nginx -v latest -f/, qr/installing: nginx-1.12.0.tar.gz.*OK/, 'install latest nginx');
 
 # delete nginx
 like(qx/$tool -r delete -a nginx -v 1.12.0/, qr/Success/, 'delete nginx');
@@ -70,13 +70,13 @@ qx(kill -HUP $pid);
 $pid = qx($srv > /dev/null 2>&1 & echo \$!);
 my $build_output = qx{$tool -r build -b tests/apache.conf};
 like($build_output, qr{Requirements installed: ERROR}, 'install build requirements');
-like($build_output, qr{Will download http://localhost:12355/nginx/nginx-1.12.0.tar.gz: OK}, 'test download of build');
+like($build_output, qr{Will download http://localhost:12355/nginx/nginx-1.12.0.tar.gz:.*OK}, 'test download of build');
 like($build_output, qr{Extract archive /tmp/app.tgz to /tmp/apache2: OK}, 'test extract of downloaded source');
-like($build_output, qr{Running pre command: OK}, 'test prebuild command');
-like($build_output, qr{Configure: OK}, 'test configure of source');
-like($build_output, qr{Make: OK}, 'test make of source');
-like($build_output, qr{Install: OK}, 'test install of source');
-like($build_output, qr{Running post command: OK}, 'test prebuild command');
+like($build_output, qr{Running pre command:.*OK}, 'test prebuild command');
+like($build_output, qr{Configure:.*OK}, 'test configure of source');
+like($build_output, qr{Make:.*OK}, 'test make of source');
+like($build_output, qr{Install:.*OK}, 'test install of source');
+like($build_output, qr{Running post command:.*OK}, 'test prebuild command');
 # cleanup
 qx(kill -HUP $pid);
 
