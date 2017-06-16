@@ -738,7 +738,7 @@ sub download {
   my $url = shift;
   my $tmp = shift;
   my $logger = $self->{logger};
-  my $timeout = 60;
+  my $timeout = 120;
   print "Will download $url: ";
   qx{wget -O $tmp --timeout=$timeout --quiet --prefer-family=IPv4 $url};
   my $exit = $? >> 8;
