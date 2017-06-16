@@ -803,6 +803,19 @@ sub build {
   $cfg->read($build_file);
   my $bb = $cfg->get_block("config");
 
+  if(not defined($bb->{'archive_type'}) 
+	 or $bb->{'archive_type'} eq ""
+     or not defined($bb->{'install_path'})
+     or $bb->{'install_path'} eq ""
+     or not defined($bb->{'url'})
+     or $bb->{'url'} eq ""
+     or not defined($bb->{'build_opts'})
+     or $bb->{'build_opts'} eq ""
+    ) 
+  {
+	print "ERROR: Missing mandatory config variable\n";
+	return 1;
+  }
 
   my $tmpfile = "/tmp/app.$bb->{'archive_type'}";
   my $build_path = defined($bb->{'build_path'}) ? $bb->{'build_path'} : "/tmp/build";

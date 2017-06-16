@@ -85,5 +85,7 @@ ok((fgrep { /echo \/usr\/local\/openssl\/1.0.2l/ } $scriptfile) == 1, 'found ope
 # clean up
 qx{rm -rf /tmp/php7};
 
+like(qx{$tool -r build -b tests/missing_variable.conf}, qr{ERROR: Missing mandatory config variable}, 'test with missing mandatory variable');
+
 
 done_testing();
