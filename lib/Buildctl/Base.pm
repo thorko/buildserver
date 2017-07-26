@@ -869,10 +869,13 @@ sub build {
     # configure
     $self->configure($build_path, $source, $bb->{'build_opts'});
     # compile
+	$bb->{'make'} = $self->rep_var($bb->{'make'}, $bb);
     $self->make($build_path, $source, $bb->{'make'});
 	# befor installing check install_path
 	$self->check_install_dir($bb->{'install_path'});
     # install
+	# expand install var
+	$bb->{'install'} = $self->rep_var($bb->{'install'}, $bb);
     $self->make_install($build_path, $source, $bb->{'install'});
     $logger->info("Sucessfully installed $bb->{'app'} $bb->{'version'}");
 
