@@ -310,8 +310,7 @@ sub get_latest {
 
 sub install {
    my $self = shift;
-   my $app = shift;
-   my $version = shift;
+   my $file = shift;
    my $config = $self->{config};
    my $logger = $self->{logger};
    my $rep = $self->{rep};
@@ -319,28 +318,29 @@ sub install {
    my $url = "";
    my $raw = "";
    my ($ua) = LWP::UserAgent->new;
-   if ($app eq "" || $version eq "") {
-     print "app or version not given.\n";
+   if ($file eq "") {
+     print "file not given.\n";
      return 0;
    } else {
+	 # get app and version from filename
      if ($version eq "latest") {
 	   # get latest version from repository
 	   $version = $self->get_latest($app);
      }
-     $logger->info("download $app-$version.tar.gz");
-     $url = "http://$rep->{'server'}:$rep->{'port'}/$app/$app-$version.tar.gz";
+     $logger->info("download $file.tar.gz");
+     $url = "http://$rep->{'server'}:$rep->{'port'}/$app/$file.tar.gz";
      printf("%-50s", "download: $app-$version.tar.gz");
-     my $r = $ua->get($url, ':content_file' => "/tmp/$app-$version.tar.gz");
+     my $r = $ua->get($url, ':content_file' => "/tmp/$file.tar.gz");
      if($r->{'_rc'} != 200) {
-       $logger->error("$app-$version.tar.gz not available in repository");
-       print "ERROR: $app-$version.tar.gz not available in repository\n";
+       $logger->error("$file.tar.gz not available in repository");
+       print "ERROR: $file.tar.gz not available in repository\n";
        return 1;
      }
 	 # only if force disabled and in config package_status is set 1
 	 if($config->{'force'} == 0 && $rep->{'package_status'} == 1) {
 	    if(defined($r->{_headers}->{packagestatus}) && $r->{_headers}->{packagestatus} =~ /i|f/) {
-			$logger->warn("/$app/$app-$version.tar.gz is set to $r->{_headers}->{packagestatus}");
-			print "/$app/$app-$version.tar.gz is set to $package_states->{$r->{_headers}->{packagestatus}}\n";
+			$logger->warn("/$app/$file.tar.gz is set to $r->{_headers}->{packagestatus}");
+			print "/$app/$file.tar.gz is set to $package_states->{$r->{_headers}->{packagestatus}}\n";
 			return 1;
 		} elsif(defined($r->{_headers}->{packagestatus}) && $r->{_headers}->{packagestatus} eq "k") {
 			# another package is set to keep
@@ -351,8 +351,8 @@ sub install {
 	 }
 	 print "[OK]\n";
 	 $logger->debug("result: $r->{_msg}");
-     $logger->info("installing $app-$version.tar.gz");
-     printf("%-50s", "installing: $app-$version.tar.gz");
+     $logger->info("installing $file.tar.gz");
+     printf("%-50s", "installing: $file.tar.gz");
 	 # make dest
 	 qx{mkdir -p $config->{'install_path'}/$app/$version};
 	 # extract app

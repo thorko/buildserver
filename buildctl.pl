@@ -12,7 +12,7 @@ use Switch;
 my $help = 0;
 my $debug = 0;
 my $force = 0;
-my ($config, $command, $app, $version, $build_file, $path, $mark, $option) = ("", "", "", "", "", "", "");
+my ($config, $command, $app, $file, $version, $build_file, $path, $mark, $option) = ("", "", "", "", "", "", "");
 
 Getopt::Long::Configure('bundling');
 GetOptions(
@@ -22,6 +22,7 @@ GetOptions(
   "r|command=s"  => \$command,
   "a|app=s"      => \$app,
   "f|force"      => \$force,
+  "t|file=s"     => \$file,
   "m|mark=s"     => \$mark,
   "o|option=s"   => \$option,
   "v|version=s"  => \$version,
@@ -32,7 +33,7 @@ GetOptions(
 pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  if ($command eq "");
 pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  if ($command eq "activate" && ($app eq "" || $version eq ""));
 pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  if ($command eq "list" && $option eq "");
-pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  if ($command eq "install" && ($app eq "" || $version eq ""));
+pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  if ($command eq "install" && $file eq "");
 pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  if ($command eq "delete" && ($app eq "" || $version eq ""));
 pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  if ($command eq "build" && $build_file eq "");
 pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  if ($command eq "pack" && ($app eq "" ||  $version eq ""));
@@ -56,7 +57,7 @@ switch ($command) {
 	case "get-active" { $buildctl->get_active($app) }
 	case "activate" { $buildctl->switch_version($app, $version) }
 	case "repository" { $buildctl->repository($app) }
-	case "install" { $buildctl->install($app, $version) }
+	case "install" { $buildctl->install($file) }
 	case "delete" { $buildctl->delete($app, $version) }
 	case "build" { $buildctl->build($build_file) }
     case "pack" { $buildctl->pack($app, $version) }
@@ -115,7 +116,7 @@ requires --app, show versions of app on repository server
 
 =item B<install>
 
-requires --app, --version: install version of app from repository server
+requires --file: install file from repository server
 
 =item B<delete>
 
