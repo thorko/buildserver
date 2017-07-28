@@ -323,24 +323,27 @@ sub install {
      return 0;
    } else {
 	 # get app and version from filename
+	 my ($app, $version) = $file =~ m/(.*)-([0-9].*).tar.gz\$/;
+
+	 ### what about latest
      if ($version eq "latest") {
 	   # get latest version from repository
 	   $version = $self->get_latest($app);
      }
-     $logger->info("download $file.tar.gz");
-     $url = "http://$rep->{'server'}:$rep->{'port'}/$app/$file.tar.gz";
-     printf("%-50s", "download: $app-$version.tar.gz");
-     my $r = $ua->get($url, ':content_file' => "/tmp/$file.tar.gz");
+     $logger->info("download $file");
+     $url = "http://$rep->{'server'}:$rep->{'port'}/$app/$file";
+     printf("%-50s", "download: $file");
+     my $r = $ua->get($url, ':content_file' => "/tmp/$file");
      if($r->{'_rc'} != 200) {
-       $logger->error("$file.tar.gz not available in repository");
-       print "ERROR: $file.tar.gz not available in repository\n";
+       $logger->error("$file not available in repository");
+       print "ERROR: $file not available in repository\n";
        return 1;
      }
 	 # only if force disabled and in config package_status is set 1
 	 if($config->{'force'} == 0 && $rep->{'package_status'} == 1) {
 	    if(defined($r->{_headers}->{packagestatus}) && $r->{_headers}->{packagestatus} =~ /i|f/) {
-			$logger->warn("/$app/$file.tar.gz is set to $r->{_headers}->{packagestatus}");
-			print "/$app/$file.tar.gz is set to $package_states->{$r->{_headers}->{packagestatus}}\n";
+			$logger->warn("/$app/$file is set to $r->{_headers}->{packagestatus}");
+			print "/$app/$file is set to $package_states->{$r->{_headers}->{packagestatus}}\n";
 			return 1;
 		} elsif(defined($r->{_headers}->{packagestatus}) && $r->{_headers}->{packagestatus} eq "k") {
 			# another package is set to keep
@@ -351,22 +354,22 @@ sub install {
 	 }
 	 print "[OK]\n";
 	 $logger->debug("result: $r->{_msg}");
-     $logger->info("installing $file.tar.gz");
-     printf("%-50s", "installing: $file.tar.gz");
+     $logger->info("installing $file");
+     printf("%-50s", "installing: $file");
 	 # make dest
 	 qx{mkdir -p $config->{'install_path'}/$app/$version};
 	 # extract app
-     qx{tar -xzf /tmp/$app-$version.tar.gz --xform=s,usr/local/$app/$version,,g -C $config->{'install_path'}/$app/$version 2> /dev/null};
+     qx{tar -xzf /tmp/$file --xform=s,usr/local/$app/$version,,g -C $config->{'install_path'}/$app/$version 2> /dev/null};
      my $exit = $? >> 8;
      if($exit != 0) {
-       $logger->error("Couldn't extract /tmp/$app-$version.tar.gz to $config->{'install_path'}/$app/$version");
-       print "Couldn't extract file /tmp/$app-$version.tar.gz to $config->{'install_path'}/$app/$version \n";
+       $logger->error("Couldn't extract /tmp/$file to $config->{'install_path'}/$app/$version");
+       print "Couldn't extract file /tmp/$file to $config->{'install_path'}/$app/$version \n";
        return 1;
      } else {
        $logger->info("Success");
        print "[OK]\n";
      } 
-     unlink("/tmp/$app-$version.tar.gz");
+     unlink("/tmp/$file");
    }
 }
 
