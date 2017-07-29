@@ -311,25 +311,29 @@ sub get_latest {
 sub install {
    my $self = shift;
    my $file = shift;
+   my $version = shift;
    my $config = $self->{config};
    my $logger = $self->{logger};
    my $rep = $self->{rep};
    my $req = "";
    my $url = "";
    my $raw = "";
+   my $app = "";
    my ($ua) = LWP::UserAgent->new;
    if ($file eq "") {
      print "file not given.\n";
      return 0;
    } else {
 	 # get app and version from filename
-	 my ($app, $version) = $file =~ m/(.*)-([0-9].*).tar.gz\$/;
-
-	 ### what about latest
-     if ($version eq "latest") {
+	 if (defined $version and $version eq "latest") {
 	   # get latest version from repository
-	   $version = $self->get_latest($app);
-     }
+	     $version = $self->get_latest($file);
+		 $file = "$file-$version.tar.gz";
+	 } else { 
+		 $version = "";
+	 }
+	 my $regex = "(.*)-([0-9].*).tar.gz\$";
+	 ($app, $version) = $file =~ m/$regex/;
      $logger->info("download $file");
      $url = "http://$rep->{'server'}:$rep->{'port'}/$app/$file";
      printf("%-50s", "download: $file");

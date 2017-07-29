@@ -46,17 +46,17 @@ edit_file_lines { $_ = "" if /k tests\/repository\/apache\/apache-1.13.0.tar.gz/
 like(qx/$tool -r list -o package_state/, qr{tests/repository/openssl/openssl-1.0.2l.tar.gz\tkeep}, 'list marked packages');
 
 # install nginx
-like(qx/$tool -r install -a nginx -v 1.12.0/, qr{/nginx/nginx-1.12.0.tar.gz is set to ignore}, 'try to install nginx');
-like(qx/$tool -r install -a nginx -v 1.12.0 -f/, qr/installing: nginx-1.12.0.tar.gz.*OK/, 'install nginx');
-like(qx/$tool -r install -a mailsrv -v 1.12.0/, qr/ERROR: mailsrv-1.12.0.tar.gz not available in repository/, 'app not available in repository');
+like(qx/$tool -r install -t nginx-1.12.0.tar.gz/, qr{/nginx/nginx-1.12.0.tar.gz is set to ignore}, 'try to install nginx');
+like(qx/$tool -r install -t nginx-1.12.0.tar.gz -f/, qr/installing: nginx-1.12.0.tar.gz.*OK/, 'install nginx');
+like(qx/$tool -r install -t mailsrv-1.12.0.tar.gz/, qr/ERROR: mailsrv-1.12.0.tar.gz not available in repository/, 'app not available in repository');
 
-like(qx/$tool -r install -a apache -v 1.13.0 /, qr{tests/repository/apache/apache-1.12.0.tar.gz is set to keep}, 'test pinned package apache - error');
-like(qx/$tool -r install -a bind -v 9.10.4-P8/, qr{tests/repository/bind/bind-9.10.4-P6.tar.gz is set to keep}, 'test pinned package bind - error');
+like(qx/$tool -r install -t apache-1.13.0.tar.gz /, qr{tests/repository/apache/apache-1.12.0.tar.gz is set to keep}, 'test pinned package apache - error');
+like(qx/$tool -r install -t bind-9.10.4-P8.tar.gz/, qr{tests/repository/bind/bind-9.10.4-P6.tar.gz is set to keep}, 'test pinned package bind - error');
 # install kept package
-like(qx/$tool -r install -a bind -v 9.10.4-P6/, qr{installing: bind-9.10.4-P6}, 'test kept package bind');
+like(qx/$tool -r install -t bind-9.10.4-P6.tar.gz/, qr{installing: bind-9.10.4-P6}, 'test kept package bind');
 
 # test latest
-like(qx/$tool -r install -a nginx -v latest -f/, qr/installing: nginx-1.12.0.tar.gz.*OK/, 'install latest nginx');
+like(qx/$tool -r install -t nginx -v latest -f/, qr/installing: nginx-1.12.0.tar.gz.*OK/, 'install latest nginx');
 
 # delete nginx
 like(qx/$tool -r delete -a nginx -v 1.12.0/, qr/nginx: delete 1.12.0.*OK/, 'delete nginx');

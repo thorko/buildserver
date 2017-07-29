@@ -57,7 +57,7 @@ switch ($command) {
 	case "get-active" { $buildctl->get_active($app) }
 	case "activate" { $buildctl->switch_version($app, $version) }
 	case "repository" { $buildctl->repository($app) }
-	case "install" { $buildctl->install($file) }
+	case "install" { if($version ne "") { $buildctl->install($file, $version) } else { $buildctl->install($file) } }
 	case "delete" { $buildctl->delete($app, $version) }
 	case "build" { $buildctl->build($build_file) }
     case "pack" { $buildctl->pack($app, $version) }
