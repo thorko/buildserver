@@ -157,7 +157,7 @@ buildctl -r repository         # list all available apps
 buildctl -r repository -a bind # list all packages of bind
 ```
 ```
-buildctl -a bind -v 9.10.4-P6 -r install
+buildctl -t bind-9.10.4-P6.tar.gz -r install
 ```
 Install latest version of bind
 ```

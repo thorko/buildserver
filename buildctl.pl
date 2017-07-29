@@ -117,6 +117,7 @@ requires --app, show versions of app on repository server
 =item B<install>
 
 requires --file: install file from repository server
+you can use also -a <app> -v latest to install latest version
 
 =item B<delete>
 
