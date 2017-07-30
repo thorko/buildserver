@@ -901,6 +901,7 @@ sub build {
     qx{rm -rf $build_path};
     qx{rm -rf $tmpfile};
   }
+  return 0;
 }
 
 
