@@ -4,7 +4,7 @@ _buildctl() {
 
    COMMANDS="list get-active repository activate install delete build pack update mark"
    SUBCOMMANDS="version package_state"
-   APPS="apache2 bind php5 postfix dovecot mariadb sqlgrey kerberos subversion modsecurity clamav zabbix zabbix-agent openssl nginx php7"
+   APPS="apache2 bind php5 postfix dovecot mariadb sqlgrey kerberos subversion modsecurity clamav zabbix zabbix-agent openssl nginx php7 redis"
 
    cur=${COMP_WORDS[COMP_CWORD]}
    prev=${COMP_WORDS[COMP_CWORD-1]}
