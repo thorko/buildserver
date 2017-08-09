@@ -91,11 +91,13 @@ like(qx{$tool -r build -b tests/missing_buildvar.conf}, qr{Missing build_opts or
 # test web
 # prepare
 qx{rm -f tests/opensource.conf};
+qx{cp tests/zabbix.conf.t tests/zabbix.conf};
 like(qx{$tool -r web}, qr{ERROR: Config file .* does not exist}, 'test web - config file missing');
 qx{cp tests/opensource_missing.conf.t tests/opensource.conf};
 like(qx{$tool -r web}, qr{ERROR: Missing parameter in config file for}, 'test web - missing parameter');
 qx{cp tests/opensource.conf.t tests/opensource.conf};
-like(qx{$tool -r web}, qr{INFO: updated buildfile}, 'test web - updated build file');
+like(qx{$tool -r web}, qr{INFO: updated buildfile}, 'test web - test update');
 qx{rm -f tests/opensource.conf};
+qx{cp tests/zabbix.conf.t tests/zabbix.conf};
 
 done_testing();

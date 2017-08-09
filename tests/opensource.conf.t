@@ -1,5 +1,5 @@
 [zabbix]
-source=https://sourceforge.net/projects/zabbix/files/
+source=file:///$(pwd)/tests/zabbix.html
 regex='ZABBIX Latest Stable\/([0-9\.]+)\/'
 buildfile=tests/zabbix.conf
 

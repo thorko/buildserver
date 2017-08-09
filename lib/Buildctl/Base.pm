@@ -11,7 +11,7 @@ use Switch;
 use version;
 use Archive::Extract;
 use File::Slurp qw( append_file edit_file_lines read_file );
-use File::Grep qw(fgrep);
+use File::Grep qw(fgrep fdo);
 use Buildctl::Constants qw($package_states);
 use Linux::Distribution qw(distribution_name distribution_version);
 
@@ -938,9 +938,22 @@ sub get_web_version {
 	    $logger->info("Couldn't get version for $app_hash->{$a}->{'source'}");
       } else {
 	    # update buildfile and run build
-        edit_file_lines { $_ = "version=\"$version\"\n" if /^version=/ } $app_hash->{$a}->{'buildfile'};
-		print "INFO: updated buildfile $app_hash->{$a}->{'buildfile'}\n";
-		#$self->update($app_hash->{$a}->{'buildfile'});
+        my $oldversion = "0";
+		fdo { my ($f, $pos, $line) = @_; 
+				if($line =~ /^version/) {
+                   ($oldversion) = $line =~ /^version=\"(.*)\"/;
+			    }
+			} $app_hash->{$a}->{'buildfile'};
+		$logger->debug("file: $oldversion web: $version");
+		if ( $oldversion ne $version ) {
+          edit_file_lines { $_ = "version=\"$version\"\n" if /^version=/ } $app_hash->{$a}->{'buildfile'};
+		  print "INFO: updated buildfile $app_hash->{$a}->{'buildfile'}\n";
+		  $self->update($app_hash->{$a}->{'buildfile'});
+		} else {
+		  # version in buildfile is the same on the web
+		  $logger->info("No need to update $a");
+		  print "INFO: No need to update $a -> web version: $version\n";
+		}
 	  }
     }
   }
