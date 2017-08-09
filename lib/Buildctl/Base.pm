@@ -592,7 +592,8 @@ sub configure {
 
   # run build
   printf("%-20s", "Configure:");
-  qx{cd $build_path/$source_dir && $build_opts > $build_path/$log 2>&1};
+  qx{echo "$build_opts" > $build_path/$log};
+  qx{cd $build_path/$source_dir && $build_opts >> $build_path/$log 2>&1};
   my $exit = $? >> 8;
   if ($exit != 0) {
     print "ERROR: configure $build_opts failed\nCheck $build_path/$log\n";
@@ -614,7 +615,8 @@ sub make {
   my $log = "make.log";
   # run make
   printf("%-20s", "Make:");
-  qx{cd $build_path/$source_dir && $make_cmd > $build_path/$log 2>&1};
+  qx{echo "$make_cmd" > $build_path/$log};
+  qx{cd $build_path/$source_dir && $make_cmd >> $build_path/$log 2>&1};
   my $exit = $? >> 8;
   if ($exit != 0) {
     print "ERROR: $make_cmd failed\nCheck $build_path/$log\n";
@@ -669,7 +671,8 @@ sub make_install {
   my $log = "install.log";
   # run make
   printf("%-20s", "Install:");
-  qx{cd $build_path/$source_dir && $install_cmd > $build_path/$log 2>&1};
+  qx{echo "$install_cmd" > $build_path/$log};
+  qx{cd $build_path/$source_dir && $install_cmd >> $build_path/$log 2>&1};
   my $exit = $? >> 8;
   if ($exit != 0) {
     print "ERROR: $install_cmd failed\nCheck $build_path/$log\n";
