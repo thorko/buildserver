@@ -2,7 +2,7 @@ _buildctl() {
    local cur prev
    COMPREPLY=()
 
-   COMMANDS="list get-active repository activate install delete build pack update mark"
+   COMMANDS="list get-active repository activate install delete build pack update mark web"
    SUBCOMMANDS="version package_state"
    APPS="apache2 bind php5 postfix dovecot mariadb sqlgrey kerberos subversion modsecurity clamav zabbix zabbix-agent openssl nginx php7 redis"
 
