@@ -63,6 +63,7 @@ switch ($command) {
     case "pack" { $buildctl->pack($app, $version) }
 	case "update" { $buildctl->update($build_file) }
 	case "mark" { $buildctl->mark($app, $version, $mark) }
+	case "web" { $buildctl->get_web_version() }
 	else { pod2usage( { -exitval=>1,  -verbose => 99, -sections =>[qw(SYNOPSIS OPTIONS)] } )  }
 }
 
@@ -138,3 +139,8 @@ requires --build-file: will build app and packing it
 =item B<mark>
 
 requires --app, --version, --mark: will mark the app in repository (allowed: k = keep, i = ignore, f = failed)
+
+=item B<web>
+
+get versions from web and update app
+requires opensource config file set in buildctl.conf

@@ -71,6 +71,8 @@ sub new {
 
 	$self->{rep} = $cfg->get_block("repository");
 
+	$self->{web} = $cfg->get_block("web");
+
 	return bless $self, $class;
 }
 
@@ -904,5 +906,44 @@ sub build {
   return 0;
 }
 
+sub get_web_version {
+  my $self = shift;
+  my $logger = $self->{logger};
+  my %cfg;
+
+  if ( ! -f $self->{web}->{configfile} ) {
+    $logger->error("Config file $self->{web}->{configfile} does not exist");
+	print "ERROR: Config file $self->{web}->{configfile} does not exist\n";
+	return 1;
+  }
+  Config::Simple->import_from($self->{web}->{configfile}, \%cfg);
+
+  my $app_hash = {};
+  foreach my $k (keys %cfg) {
+    my ($app, $key) = split(/\./, $k);
+    $app_hash->{$app}->{$key} = $cfg{$k};
+  }
+
+  foreach my $a (keys %$app_hash) {
+	# check for required fields in config
+	if( not defined($app_hash->{$a}->{'source'}) or $app_hash->{$a}->{'source'} eq "" or
+		not defined($app_hash->{$a}->{'regex'}) or $app_hash->{$a}->{'regex'} eq "" or
+		not defined($app_hash->{$a}->{'buildfile'}) or $app_hash->{$a}->{'buildfile'} eq "") {
+		$logger->error("Missing parameter in config file for $a");
+		print "ERROR: Missing parameter in config file for $a\n";
+	} else {
+      my $version = qx{curl -s $app_hash->{$a}->{'source'} | perl -nle '/$app_hash->{$a}->{'regex'}/ && print \$1'};
+      chop($version);
+      if ( not defined $version or $version eq "" ) {
+	    $logger->info("Couldn't get version for $app_hash->{$a}->{'source'}");
+      } else {
+	    # update buildfile and run build
+        edit_file_lines { $_ = "version=\"$version\"\n" if /^version=/ } $app_hash->{$a}->{'buildfile'};
+		print "INFO: updated buildfile $app_hash->{$a}->{'buildfile'}\n";
+		#$self->update($app_hash->{$a}->{'buildfile'});
+	  }
+    }
+  }
+}
 
 1;

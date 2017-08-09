@@ -88,5 +88,14 @@ qx{rm -rf /tmp/php7};
 like(qx{$tool -r build -b tests/missing_variable.conf}, qr{ERROR: Missing mandatory config variable}, 'test with missing mandatory variable');
 like(qx{$tool -r build -b tests/missing_buildvar.conf}, qr{Missing build_opts or build_script in config file}, 'test with missing build variable');
 
+# test web
+# prepare
+qx{rm -f tests/opensource.conf};
+like(qx{$tool -r web}, qr{ERROR: Config file .* does not exist}, 'test web - config file missing');
+qx{cp tests/opensource_missing.conf.t tests/opensource.conf};
+like(qx{$tool -r web}, qr{ERROR: Missing parameter in config file for}, 'test web - missing parameter');
+qx{cp tests/opensource.conf.t tests/opensource.conf};
+like(qx{$tool -r web}, qr{INFO: updated buildfile}, 'test web - updated build file');
+qx{rm -f tests/opensource.conf};
 
 done_testing();
