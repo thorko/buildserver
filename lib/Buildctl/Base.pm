@@ -952,6 +952,16 @@ sub get_web_version {
           edit_file_lines { $_ = "version=\"$version\"\n" if /^version=/ } $app_hash->{$a}->{'buildfile'};
 		  print "INFO: updated buildfile $app_hash->{$a}->{'buildfile'}\n";
 		  $self->update($app_hash->{$a}->{'buildfile'});
+		  # send mail
+		  if ( defined $self->{web}->{mailto} and $self->{web}->{mailto} ne "" ) {
+			my $msg = "Updated $a -> $version\n";
+			open(MAIL, "|/usr/sbin/sendmail -t");
+			print MAIL "To: $self->{web}->{mailto}\n";
+			print MAIL "From: root\@thorko.de\n";
+			print MAIL "Subject: Updated app\n";
+			print MAIL $msg;
+			close(MAIL);
+		  }
 		} else {
 		  # version in buildfile is the same on the web
 		  $logger->info("No need to update $a");
