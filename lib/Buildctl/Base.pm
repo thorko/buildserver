@@ -939,6 +939,9 @@ sub get_web_version {
       chop($version);
       if ( not defined $version or $version eq "" ) {
 	    $logger->info("Couldn't get version for $app_hash->{$a}->{'source'}");
+		if ( defined $self->{web}->{mailto} and $self->{web}->{mailto} ne "" ) {
+		  $self->mail("Couldn't get version for $app_hash->{$a}->{'source'}\n", $self->{web}->{mailto});
+		}
       } else {
 	    # update buildfile and run build
         my $oldversion = "0";
@@ -954,13 +957,7 @@ sub get_web_version {
 		  $self->update($app_hash->{$a}->{'buildfile'});
 		  # send mail
 		  if ( defined $self->{web}->{mailto} and $self->{web}->{mailto} ne "" ) {
-			my $msg = "Updated $a -> $version\n";
-			open(MAIL, "|/usr/sbin/sendmail -t");
-			print MAIL "To: $self->{web}->{mailto}\n";
-			print MAIL "From: root\@thorko.de\n";
-			print MAIL "Subject: Updated app\n";
-			print MAIL $msg;
-			close(MAIL);
+			$self->mail("Updated $a -> $version\n", $self->{web}->{mailto});
 		  }
 		} else {
 		  # version in buildfile is the same on the web
@@ -970,6 +967,19 @@ sub get_web_version {
 	  }
     }
   }
+}
+
+# routine to send mail
+sub mail {
+	my $self = shift;
+	my $msg = shift;
+	my $to = shift;
+	open(MAIL, "|/usr/sbin/sendmail -t");
+    print MAIL "To: $to\n";
+	print MAIL "From: root\@thorko.de\n";
+	print MAIL "Subject: Updated app\n";
+	print MAIL $msg;
+	close(MAIL);
 }
 
 1;
