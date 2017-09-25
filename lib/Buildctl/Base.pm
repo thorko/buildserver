@@ -87,22 +87,35 @@ sub list_versions {
             if ( ! -d "$config->{'install_path'}/$_" ) {
                 print "$config->{'install_path'}/$_ does not exist.\n";
             } else {
+              my $active = readlink("$config->{'install_path'}/$_/current");
+              $active =~ s{.*/}{};
                 my @v = glob "$config->{'install_path'}/$_/[0-9].*";
                 printf("%-20s", "$_:");
                 foreach (@v) {
                     $_ =~ s{.*/}{};
-                    print " $_ ";
+                    if($_ eq $active) {
+                      print " \033[1m$_\033[0m ";
+                    } else
+                      print " $_ ";
+                    }
                 }
                 print "\n";
             }
        }
     } else {
+		  my $active = readlink("$config->{'install_path'}/$app/current");
+		  $active =~ s{.*/}{};
+		  print "$app: $v\n" if ($v =~ /^\d+/);
        $logger->debug("list version of $app");
        my @v = glob "$config->{'install_path'}/$app/[0-9].*";
        printf("%-20s", "$app:");
        foreach (@v) {
             $_ =~ s{.*/}{};
-            print " $_ ";
+            if ($_ eq $active) {
+              print " \033[1m$_\033[0m ";
+            } else
+              print " $_ ";
+            }
        }
        print "\n";
    }
