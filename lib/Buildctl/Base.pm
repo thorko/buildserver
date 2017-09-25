@@ -95,7 +95,7 @@ sub list_versions {
                     $_ =~ s{.*/}{};
                     if($_ eq $active) {
                       print " \033[1m$_\033[0m ";
-                    } else
+                    } else {
                       print " $_ ";
                     }
                 }
@@ -113,7 +113,7 @@ sub list_versions {
             $_ =~ s{.*/}{};
             if ($_ eq $active) {
               print " \033[1m$_\033[0m ";
-            } else
+            } else {
               print " $_ ";
             }
        }
