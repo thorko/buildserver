@@ -87,8 +87,8 @@ sub list_versions {
             if ( ! -d "$config->{'install_path'}/$_" ) {
                 print "$config->{'install_path'}/$_ does not exist.\n";
             } else {
-              my $active = readlink("$config->{'install_path'}/$_/current");
-              $active =~ s{.*/}{};
+                my $active = readlink("$config->{'install_path'}/$_/current");
+                $active =~ s{.*/}{};
                 my @v = glob "$config->{'install_path'}/$_/[0-9].*";
                 printf("%-20s", "$_:");
                 foreach (@v) {
@@ -103,9 +103,8 @@ sub list_versions {
             }
        }
     } else {
-		  my $active = readlink("$config->{'install_path'}/$app/current");
-		  $active =~ s{.*/}{};
-		  print "$app: $v\n" if ($v =~ /^\d+/);
+		   my $active = readlink("$config->{'install_path'}/$app/current");
+		   $active =~ s{.*/}{};
        $logger->debug("list version of $app");
        my @v = glob "$config->{'install_path'}/$app/[0-9].*";
        printf("%-20s", "$app:");
