@@ -21,7 +21,7 @@ install:
 	cp -fp buildsrv.service /etc/systemd/system/buildsrv.service
 	systemctl daemon-reload
 	cp -fp buildctl.bash /etc/bash_completion.d/buildctl
-	cp -fpr apps /etc/buildctl/
+#	cp -fpr apps /etc/buildctl/
 
 
 update:
