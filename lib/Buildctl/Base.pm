@@ -581,10 +581,10 @@ sub build_script {
   qx{chmod +x $build_path/$script};
   # run build script
   print "Run your build script $build_path/$script:\t";
-  qx{$build_path/$script > $build_path/build.log 2>&1};
+  qx{$build_path/$script > $build_log 2>&1};
   my $exit = $? >> 8;
   if($exit != 0) {
-    print "ERROR: check your build script and log $build_path/build.log\n";
+    print "ERROR: check your build script and log $build_log\n";
     exit 1;
   } else {
     print "[OK]\n";
@@ -605,10 +605,10 @@ sub configure {
   # run build
   printf("%-20s", "Configure:");
   qx{echo "$build_opts" > $build_path/$log};
-  qx{cd $build_path/$source_dir && $build_opts >> $build_path/$log 2>&1};
+  qx{cd $build_path/$source_dir && $build_opts >> $build_log 2>&1};
   my $exit = $? >> 8;
   if ($exit != 0) {
-    print "ERROR: configure $build_opts failed\nCheck $build_path/$log\n";
+    print "ERROR: configure $build_opts failed\nCheck $build_log\n";
     exit 1;
   } else {
     print "[OK]\n";
@@ -628,10 +628,10 @@ sub make {
   # run make
   printf("%-20s", "Make:");
   qx{echo "$make_cmd" > $build_path/$log};
-  qx{cd $build_path/$source_dir && $make_cmd >> $build_path/$log 2>&1};
+  qx{cd $build_path/$source_dir && $make_cmd >> $build_log 2>&1};
   my $exit = $? >> 8;
   if ($exit != 0) {
-    print "ERROR: $make_cmd failed\nCheck $build_path/$log\n";
+    print "ERROR: $make_cmd failed\nCheck $build_log\n";
     exit 1;
   } else {
     print "[OK]\n";
@@ -684,10 +684,10 @@ sub make_install {
   # run make
   printf("%-20s", "Install:");
   qx{echo "$install_cmd" > $build_path/$log};
-  qx{cd $build_path/$source_dir && $install_cmd >> $build_path/$log 2>&1};
+  qx{cd $build_path/$source_dir && $install_cmd >> $build_log 2>&1};
   my $exit = $? >> 8;
   if ($exit != 0) {
-    print "ERROR: $install_cmd failed\nCheck $build_path/$log\n";
+    print "ERROR: $install_cmd failed\nCheck $build_log\n";
     exit 1;
   } else {
     print "[OK]\n";
@@ -703,11 +703,11 @@ sub pre_post_action {
   my $logger = $self->{logger};
 
   print "Running $type command:\t";
-  qx{cd $build_path && $command > $build_path/$type.log 2>&1};
+  qx{cd $build_path && $command > $build_log 2>&1};
   my $rc = $? >> 8;
   if ($rc != 0 ) {
-    $logger->error("build command $command failed, check log $build_path/$type.log");
-    print "ERROR: build command $command failed, check log $build_path/$type.log\n";
+    $logger->error("build command $command failed, check log $build_log");
+    print "ERROR: build command $command failed, check log $build_log\n";
     exit 1;
   }
   print "[OK]\n";
