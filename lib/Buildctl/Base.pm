@@ -855,7 +855,7 @@ sub build {
 
   my $tmpfile = "/tmp/app.$bb->{'archive_type'}";
   my $build_path = defined($bb->{'build_path'}) ? $bb->{'build_path'} : "/tmp/build";
-  my $build_log = defined($bb->{'build_log'}) ? $bb->{'build_log'} : "/tmp/build.log";
+  my $build_log = defined($bb->{'build_log'}) ? $self->rep_var($bb->{'build_log'}, $bb) : "/tmp/build.log";
 
   qx{mkdir -p $build_path};
   # cleanup build path
