@@ -546,6 +546,7 @@ sub build_script {
   my $self = shift;
   my $bb = shift;
   my $build_path = shift;
+  my $build_log = shift;
   my $logger = $self->{logger};
   if ( ! -f $bb->{'build_script'} ) {
 	  print "ERROR: the build script $bb->{'build_script'} does not exist\n";
@@ -600,6 +601,7 @@ sub configure {
   my $build_path = shift; 
   my $source_dir = shift;
   my $build_opts = shift;
+  my $build_log = shift;
   my $log = "configure.log";
 
   # run build
@@ -624,10 +626,10 @@ sub make {
   my $build_path = shift;
   my $source_dir = shift;
   my $make_cmd = shift;
-  my $log = "make.log";
+  my $build_log = shift;
   # run make
   printf("%-20s", "Make:");
-  qx{echo "$make_cmd" > $build_path/$log};
+  qx{echo "$make_cmd" > $build_log};
   qx{cd $build_path/$source_dir && $make_cmd >> $build_log 2>&1};
   my $exit = $? >> 8;
   if ($exit != 0) {
@@ -680,10 +682,10 @@ sub make_install {
   my $build_path = shift;
   my $source_dir = shift;
   my $install_cmd = shift;
-  my $log = "install.log";
+  my $build_log = shift;
   # run make
   printf("%-20s", "Install:");
-  qx{echo "$install_cmd" > $build_path/$log};
+  qx{echo "$install_cmd" > $build_log};
   qx{cd $build_path/$source_dir && $install_cmd >> $build_log 2>&1};
   my $exit = $? >> 8;
   if ($exit != 0) {
@@ -700,6 +702,7 @@ sub pre_post_action {
   my $command = shift;
   my $type = shift;
   my $build_path = shift;
+  my $build_log = shift;
   my $logger = $self->{logger};
 
   print "Running $type command:\t";
@@ -852,6 +855,7 @@ sub build {
 
   my $tmpfile = "/tmp/app.$bb->{'archive_type'}";
   my $build_path = defined($bb->{'build_path'}) ? $bb->{'build_path'} : "/tmp/build";
+  my $build_log = defined($bb->{'build_log'}) ? $bb->{'build_log'} : "/tmp/build.log";
 
   qx{mkdir -p $build_path};
   # cleanup build path
@@ -877,7 +881,7 @@ sub build {
 
   # check if build_script exists and call a different function
   if(defined($bb->{'build_script'})) {
-    $self->build_script($bb, $build_path);
+    $self->build_script($bb, $build_path, $build_log);
   } else {
     # download source
     if($self->download($bb->{'url'}, $tmpfile)) {
@@ -888,25 +892,25 @@ sub build {
     # run prebuild_command
     if(defined($bb->{'prebuild_command'}) && $bb->{'prebuild_command'} ne "" ){
       $bb->{'prebuild_command'} = $self->rep_var($bb->{'prebuild_command'}, $bb);
-      $self->pre_post_action($bb->{'prebuild_command'}, "pre", $build_path);
+      $self->pre_post_action($bb->{'prebuild_command'}, "pre", $build_path, $build_log);
     }
     # configure
-    $self->configure($build_path, $source, $bb->{'build_opts'});
+    $self->configure($build_path, $source, $bb->{'build_opts'}, $build_log);
     # compile
 	$bb->{'make'} = $self->rep_var($bb->{'make'}, $bb);
-    $self->make($build_path, $source, $bb->{'make'});
+    $self->make($build_path, $source, $bb->{'make'}, $build_log);
 	# befor installing check install_path
 	$self->check_install_dir($bb->{'install_path'});
     # install
 	# expand install var
 	$bb->{'install'} = $self->rep_var($bb->{'install'}, $bb);
-    $self->make_install($build_path, $source, $bb->{'install'});
+    $self->make_install($build_path, $source, $bb->{'install'}, $build_log);
     $logger->info("Sucessfully installed $bb->{'app'} $bb->{'version'}");
 
     # run post build action
     if(defined($bb->{'postbuild_command'}) && $bb->{'postbuild_command'} ne "" ){
       $bb->{'postbuild_command'} = $self->rep_var($bb->{'postbuild_command'}, $bb);
-      $self->pre_post_action($bb->{'postbuild_command'}, "post", $build_path);
+      $self->pre_post_action($bb->{'postbuild_command'}, "post", $build_path, $build_log);
     }
   }
 
