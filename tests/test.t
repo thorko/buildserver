@@ -69,7 +69,7 @@ is($b->pack("apache2", ""), 1, "pack - required options missing");
 is($b->pack("apache2", "1.2.0"), 0, "pack - couldn't pack");
 
 # test build script expansion
-like(qx{$tool -r build -b tests/mariadb.conf}, qr{Run your build script /tmp/test_mariadb/mariadb.sh:\tERROR: check your build script and log /tmp/test_mariadb/build.log}, 'create build script');
+like(qx{$tool -r build -b tests/mariadb.conf}, qr{Run your build script /tmp/test_mariadb/mariadb.sh:\tERROR: check your build script and log /tmp/mariadb-build.log}, 'create build script');
 my $scriptfile = "/tmp/test_mariadb/mariadb.sh";
 ok((fgrep { /https.*mariadb-5\.5\.56\.tar\.gz/ } $scriptfile) == 1, 'found version in url');
 ok((fgrep { /configure.*mariadb.5\.5\.56 --with/ } $scriptfile) == 1, 'found version in configure line');
