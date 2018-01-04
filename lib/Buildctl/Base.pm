@@ -16,17 +16,17 @@ use Buildctl::Constants qw($package_states);
 use Linux::Distribution qw(distribution_name distribution_version);
 
 sub new {
-	my ($class, %args) = @_;
-	my $self;
+  my ($class, %args) = @_;
+  my $self;
 
-	my $config = $args{config};
-	my $debug = $args{debug} // 0;
-	my $force = $args{force};
+  my $config = $args{config};
+  my $debug = $args{debug} // 0;
+  my $force = $args{force};
 
-	my @apps;
-	my $cfg = new Config::Simple();
+  my @apps;
+  my $cfg = new Config::Simple();
     $cfg->read($config);
-	my $log = $cfg->get_block("log");
+  my $log = $cfg->get_block("log");
 
   $log->{'loglevel'} = "DEBUG" if ($debug);
   my $log_conf;
@@ -53,34 +53,34 @@ sub new {
   }
 
 
-	Log::Log4perl->init(\$log_conf);
-	$self->{logger} = Log::Log4perl->get_logger();
-	$self->{config} = $cfg->get_block("config");
-	$self->{config}->{'force'} = $force;
-	# it's hardcoded
-	$self->{config}->{'package_file'} = "$self->{config}->{repository}/.package_info";
+  Log::Log4perl->init(\$log_conf);
+  $self->{logger} = Log::Log4perl->get_logger();
+  $self->{config} = $cfg->get_block("config");
+  $self->{config}->{'force'} = $force;
+  # it's hardcoded
+  $self->{config}->{'package_file'} = "$self->{config}->{repository}/.package_info";
 
-	# read apps
-	my $a = $cfg->get_block("apps");
-	foreach my $l (keys %$a) {
-		if($a->{$l} == 1) {
-			push @apps, $l;
-		}
+  # read apps
+  my $a = $cfg->get_block("apps");
+  foreach my $l (keys %$a) {
+    if($a->{$l} == 1) {
+      push @apps, $l;
+    }
         }
-	$self->{apps} = \@apps;
+  $self->{apps} = \@apps;
 
-	$self->{rep} = $cfg->get_block("repository");
+  $self->{rep} = $cfg->get_block("repository");
 
-	$self->{web} = $cfg->get_block("web");
+  $self->{web} = $cfg->get_block("web");
 
-	return bless $self, $class;
+  return bless $self, $class;
 }
 
 sub list_versions {
     my $self = shift;
     my $app = shift;
     my $config = $self->{config};
-	  my $logger = $self->{logger};
+    my $logger = $self->{logger};
     $logger->debug("list versions");
     if ( !defined($app) ||  $app eq "" || $app eq "all") {
        foreach (@{$self->{apps}}) {
@@ -103,8 +103,8 @@ sub list_versions {
             }
        }
     } else {
-		   my $active = readlink("$config->{'install_path'}/$app/current") || 0;
-		   $active =~ s{.*/}{};
+       my $active = readlink("$config->{'install_path'}/$app/current") || 0;
+       $active =~ s{.*/}{};
        $logger->debug("list version of $app");
        my @v = glob "$config->{'install_path'}/$app/[0-9].*";
        printf("%-20s", "$app:");
@@ -129,82 +129,82 @@ sub service_action {
    my $logger = $self->{logger};
 
    if ( defined($config->{'init_sysv'}) and $config->{'init_sysv'} ne "") {
-	 my $exit = 0;
+   my $exit = 0;
      my $unit = "";
      switch ($config->{'init_sysv'}) {
-		  case "systemd" { 
-                      # get available service
-                      $unit = qx{/bin/systemctl list-unit-files |grep -E "$app.*service.*enabled"};
-                      my @units = split('\n', $unit);
-                      if (scalar(@units) < 1) {
-					    if($config->{'restart'} eq "soft") {
-							print "WARN: start-stop script couldn't be found\n";
-							return 0;
-						} elsif ($config->{'restart'} eq "hard") {
-                            print "ERROR: start-stop script couldn't be found\n";
-                            exit(1);
-						} else {
-							# ignore init file
-							return 0;
-						}
-                      } 
-                      # foreach service run the action
-                      foreach (@units) {
-                          $_ =~ s/.service.*enabled//g;
-                          chomp($_);
-                          print "Will $action $_? (type uppercase yes): ";
-                          my $answer = <STDIN>;
-                          if($answer !~ /YES/) {
-                            # only do the action if user types YES
-                            print "will not do anything\n";
-                            next;
-                          } else {
-                            qx{/bin/systemctl $action $_};
-							if($? != 0) {
-								print "ERROR: $_ couldn't $action\n";
-							} else {
-								print "$_ $action: [OK]\n";
-							}
-                          }
-                      } 
-                    }
-		  case "initd"   {  
-                      # get available init files
-                      $unit = qx{find /etc/init.d/ -executable | grep $app};
-                      my @units = split('\n', $unit);
-                      if (scalar(@units) < 1) {
-					    if($config->{'restart'} eq "soft") {
-							print "WARN: start-stop script couldn't be found\n";
-							return 0;
-						} elsif ($config->{'restart'} eq "hard") {
-                            print "ERROR: start-stop script couldn't be found\n";
-                            exit(1);
-						} else {
-							# ignore init file
-							return 0;
-						}
-                      } 
-                      # foreach service run the action
-                      foreach (@units) {
-                          chomp($_);
-                          print "Will $action $_? (type uppercase yes): ";
-                          my $answer = <STDIN>;
-                          if($answer !~ /YES/) {
-                            # only do the action if user types YES
-                            print "will not do anything\n";
-                            next;
-                          } else {
-                            qx{$_ $action};
-							if($? != 0) {
-								print "ERROR: $_ couldn't $action\n";
-							} else {
-								print "$_ $action: [OK]\n";
-							}
-                          }
-                      } 
-		            }
-	   }
-   }
+      case "systemd" { 
+              # get available service
+              $unit = qx{/bin/systemctl list-unit-files |grep -E "$app.*service.*enabled"};
+              my @units = split('\n', $unit);
+              if (scalar(@units) < 1) {
+                if($config->{'restart'} eq "soft") {
+                  print "WARN: start-stop script couldn't be found\n";
+                  return 0;
+                } elsif ($config->{'restart'} eq "hard") {
+                  print "ERROR: start-stop script couldn't be found\n";
+                  exit(1);
+                } else {
+                  # ignore init file
+                  return 0;
+                }
+              } 
+              # foreach service run the action
+              foreach (@units) {
+                $_ =~ s/.service.*enabled//g;
+                chomp($_);
+                print "Will $action $_? (type uppercase yes): ";
+                my $answer = <STDIN>;
+                if($answer !~ /YES/) {
+                  # only do the action if user types YES
+                  print "will not do anything\n";
+                  next;
+                } else {
+                  qx{/bin/systemctl $action $_};
+                  if($? != 0) {
+                    print "ERROR: $_ couldn't $action\n";
+                  } else {
+                    print "$_ $action: [OK]\n";
+                  }
+                }
+              } 
+      }
+      case "initd" {  
+        # get available init files
+        $unit = qx{find /etc/init.d/ -executable | grep $app};
+        my @units = split('\n', $unit);
+        if (scalar(@units) < 1) {
+          if($config->{'restart'} eq "soft") {
+            print "WARN: start-stop script couldn't be found\n";
+            return 0;
+          } elsif ($config->{'restart'} eq "hard") {
+            print "ERROR: start-stop script couldn't be found\n";
+            exit(1);
+          } else {
+            # ignore init file
+            return 0;
+          }
+        } 
+        # foreach service run the action
+        foreach (@units) {
+          chomp($_);
+          print "Will $action $_? (type uppercase yes): ";
+          my $answer = <STDIN>;
+          if($answer !~ /YES/) {
+            # only do the action if user types YES
+            print "will not do anything\n";
+            next;
+          } else {
+            qx{$_ $action};
+            if($? != 0) {
+              print "ERROR: $_ couldn't $action\n";
+            } else {
+              print "$_ $action: [OK]\n";
+            }
+          }
+        } 
+      }
+    }
+  }
 }
 
 sub switch_version {
@@ -215,53 +215,53 @@ sub switch_version {
    my $logger = $self->{logger};
    if ($app eq "" || $version eq "") {
      print "no app or version given\n";
-	 return 1;
+     return 1;
    } else {
-	 if ( ! -d "$config->{'install_path'}/$app/$version" ) {
-		print "ERROR: $app version $version not available\n";
-		return 1;
-	 }
-	 # stop service
-	 $self->service_action($app, "stop");
+   if ( ! -d "$config->{'install_path'}/$app/$version" ) {
+    print "ERROR: $app version $version not available\n";
+    return 1;
+   }
+   # stop service
+   $self->service_action($app, "stop");
      $logger->debug("$app: -> $version");
-	 qx{ln -sfn $config->{'install_path'}/$app/$version $config->{'install_path'}/$app/current};
-	 my $exit = $? >> 8;
-	 if($exit != 0) {
-		print "ERROR: $app couldn't activate $version\n";
-		print "ln -sfn failed\n";
-		exit $exit;
-	 } else {
-		print "$app: activated $version\n";
-	 }
-	 # start service again
-	 $self->service_action($app, "start");
+   qx{ln -sfn $config->{'install_path'}/$app/$version $config->{'install_path'}/$app/current};
+   my $exit = $? >> 8;
+   if($exit != 0) {
+    print "ERROR: $app couldn't activate $version\n";
+    print "ln -sfn failed\n";
+    exit $exit;
+   } else {
+    print "$app: activated $version\n";
+   }
+   # start service again
+   $self->service_action($app, "start");
    }
 }
 
 sub get_active {
     my $self = shift;
-	my $app = shift;
-	my $config = $self->{config};
-	my $logger = $self->{logger};
-	if ( $app eq "" || $app eq "all") {
-	   foreach (@{$self->{apps}}) {
-			if(-l "$config->{'install_path'}/$_/current") {
-			  my $v = readlink("$config->{'install_path'}/$_/current");
-			  $v =~ s{.*/}{};
-			  print "$_: $v\n" if ($v =~ /^\d+/);
-         	} else {
-				$logger->debug("$_: current link does not exist");
-			}
-	   }
-	} else {
-		if(-l "$config->{'install_path'}/$app/current") {
-		  my $v = readlink("$config->{'install_path'}/$app/current");
-		  $v =~ s{.*/}{};
-		  print "$app: $v\n" if ($v =~ /^\d+/);
+  my $app = shift;
+  my $config = $self->{config};
+  my $logger = $self->{logger};
+  if ( $app eq "" || $app eq "all") {
+     foreach (@{$self->{apps}}) {
+      if(-l "$config->{'install_path'}/$_/current") {
+        my $v = readlink("$config->{'install_path'}/$_/current");
+        $v =~ s{.*/}{};
+        print "$_: $v\n" if ($v =~ /^\d+/);
+          } else {
+        $logger->debug("$_: current link does not exist");
+      }
+     }
+  } else {
+    if(-l "$config->{'install_path'}/$app/current") {
+      my $v = readlink("$config->{'install_path'}/$app/current");
+      $v =~ s{.*/}{};
+      print "$app: $v\n" if ($v =~ /^\d+/);
         } else {
-		  $logger->debug("$app: current link does not exist");
+      $logger->debug("$app: current link does not exist");
         }
-	}
+  }
 }
 
 sub repository {
@@ -289,15 +289,15 @@ sub repository {
       $req = HTTP::Request->new(GET => $url);
       $raw = $ua->request($req)->content;
       foreach (split("\n", $raw)) {
-		if($_ =~ /^$app.*/) {
-		    print "$_\n";
-		}
+    if($_ =~ /^$app.*/) {
+        print "$_\n";
+    }
       }
    }
 }
 
 sub get_latest {
-	my $self = shift;
+  my $self = shift;
     my $app = shift;
     my $config = $self->{config};
     my $logger = $self->{logger};
@@ -305,7 +305,7 @@ sub get_latest {
     my $req = "";
     my $url = "";
     my $raw = "";
-	my $version = 0;
+  my $version = 0;
     my ($ua) = LWP::UserAgent->new;
     $url = "http://$rep->{'server'}:$rep->{'port'}/$app";
     $req = HTTP::Request->new(GET => $url);
@@ -314,10 +314,10 @@ sub get_latest {
     my $text = $hs->parse($raw);
     $hs->eof;
     foreach (split("\n", $text)) {
-	  if($_ =~ /^$app-/) {
-	    $_ =~ s/^$app-(.*)\.tar\.gz.*/$1/;
-	    $version = $_ if(version->parse($_) > $version);
-	  }
+    if($_ =~ /^$app-/) {
+      $_ =~ s/^$app-(.*)\.tar\.gz.*/$1/;
+      $version = $_ if(version->parse($_) > $version);
+    }
     }
     return $version;
 }
@@ -338,16 +338,16 @@ sub install {
      print "file not given.\n";
      return 0;
    } else {
-	 # get app and version from filename
-	 if (defined $version and $version eq "latest") {
-	   # get latest version from repository
-	     $version = $self->get_latest($file);
-		 $file = "$file-$version.tar.gz";
-	 } else { 
-		 $version = "";
-	 }
-	 my $regex = "(.*)-([0-9].*).tar.gz\$";
-	 ($app, $version) = $file =~ m/$regex/;
+   # get app and version from filename
+   if (defined $version and $version eq "latest") {
+     # get latest version from repository
+       $version = $self->get_latest($file);
+     $file = "$file-$version.tar.gz";
+   } else { 
+     $version = "";
+   }
+   my $regex = "(.*)-([0-9].*).tar.gz\$";
+   ($app, $version) = $file =~ m/$regex/;
      $logger->info("download $file");
      $url = "http://$rep->{'server'}:$rep->{'port'}/$app/$file";
      printf("%-50s", "download: $file");
@@ -357,26 +357,26 @@ sub install {
        print "ERROR: $file not available in repository\n";
        return 1;
      }
-	 # only if force disabled and in config package_status is set 1
-	 if($config->{'force'} == 0 && $rep->{'package_status'} == 1) {
-	    if(defined($r->{_headers}->{packagestatus}) && $r->{_headers}->{packagestatus} =~ /i|f/) {
-			$logger->warn("/$app/$file is set to $r->{_headers}->{packagestatus}");
-			print "/$app/$file is set to $package_states->{$r->{_headers}->{packagestatus}}\n";
-			return 1;
-		} elsif(defined($r->{_headers}->{packagestatus}) && $r->{_headers}->{packagestatus} eq "k") {
-			# another package is set to keep
-			$logger->warn("$r->{_headers}->{package} is set to keep");
-			print "$r->{_headers}->{package} is set to keep\n";
-			return 1;
-		}
-	 }
-	 print "[OK]\n";
-	 $logger->debug("result: $r->{_msg}");
+   # only if force disabled and in config package_status is set 1
+   if($config->{'force'} == 0 && $rep->{'package_status'} == 1) {
+      if(defined($r->{_headers}->{packagestatus}) && $r->{_headers}->{packagestatus} =~ /i|f/) {
+      $logger->warn("/$app/$file is set to $r->{_headers}->{packagestatus}");
+      print "/$app/$file is set to $package_states->{$r->{_headers}->{packagestatus}}\n";
+      return 1;
+    } elsif(defined($r->{_headers}->{packagestatus}) && $r->{_headers}->{packagestatus} eq "k") {
+      # another package is set to keep
+      $logger->warn("$r->{_headers}->{package} is set to keep");
+      print "$r->{_headers}->{package} is set to keep\n";
+      return 1;
+    }
+   }
+   print "[OK]\n";
+   $logger->debug("result: $r->{_msg}");
      $logger->info("installing $file");
      printf("%-50s", "installing: $file");
-	 # make dest
-	 qx{mkdir -p $config->{'install_path'}/$app/$version};
-	 # extract app
+   # make dest
+   qx{mkdir -p $config->{'install_path'}/$app/$version};
+   # extract app
      qx{tar -xzf /tmp/$file --xform=s,usr/local/$app/$version,,g -C $config->{'install_path'}/$app/$version 2> /dev/null};
      my $exit = $? >> 8;
      if($exit != 0) {
@@ -393,13 +393,13 @@ sub install {
 
 sub delete {
     my $self = shift;
-	my $app = shift;
-	my $version = shift;
-	my $config = $self->{config};
-	my $logger = $self->{logger};
-	if($app eq "" || $version eq "") {
-		print "app or version not given.\n";
-		return 0;
+  my $app = shift;
+  my $version = shift;
+  my $config = $self->{config};
+  my $logger = $self->{logger};
+  if($app eq "" || $version eq "") {
+    print "app or version not given.\n";
+    return 0;
     }
 
   my $active_version = readlink("$config->{'install_path'}/$app/current");
@@ -447,11 +447,11 @@ sub pack {
   if ($rc != 0 ) {
     $logger->error("packaging of $app $version failed");
     print "ERROR: packaging of $app $version failed\n";
-	return 1;
+  return 1;
   } else {
-	$logger->info("packaging of $app $version: ok");
+  $logger->info("packaging of $app $version: ok");
     print "[OK]\n";
-	return 0;
+  return 0;
   }
 }
 
@@ -461,15 +461,15 @@ sub list_package_state {
   my $package_info = $config->{'package_file'};
 
   if( ! -f $package_info) {
-	print "No package_info file: Nothing is marked!\n";
-	return 0;
+  print "No package_info file: Nothing is marked!\n";
+  return 0;
   }
   my $lines = read_file($package_info, array_ref => 1);
   foreach (@$lines) {
-	# ignore comments
-	next if($_ =~ /^#/ );
-	my ($state, $package) = split(" ", $_);
-	print "$package\t$package_states->{$state}\n";
+  # ignore comments
+  next if($_ =~ /^#/ );
+  my ($state, $package) = split(" ", $_);
+  print "$package\t$package_states->{$state}\n";
   }
   return 0;
 }
@@ -486,28 +486,28 @@ sub mark {
 
    if($mark !~ /k|f|i/) {
      $logger->error("Bad mark option $mark");
-	 print "ERROR: Only k, f, i are allowed\n";
-	 return 1;
+   print "ERROR: Only k, f, i are allowed\n";
+   return 1;
    }
 
    # if package file does not exist in repository
    if(! -f "$config->{repository}/$app/$app-$version.tar.gz" ) {
      $logger->error("Mark: $config->{repository}/$app/$app-$version.tar.gz is not in repository");
-	 print "ERROR: $config->{repository}/$app/$app-$version.tar.gz is not in repository\n";
-	 return 1;
+   print "ERROR: $config->{repository}/$app/$app-$version.tar.gz is not in repository\n";
+   return 1;
    }
 
    my @matches = fgrep { /$config->{repository}\/$app\/$app-$version.tar.gz/ } $package_info;
    foreach (@matches) {
      if($_->{count} > 0) {
        edit_file_lines { $_ = "$mark $config->{repository}/$app/$app-$version.tar.gz\n" if /$app-$version\.tar\.gz/ } $package_info;
-	   $logger->info("Marked $config->{repository}/$app/$app-$version.tar.gz as $package_states->{$mark}");
+     $logger->info("Marked $config->{repository}/$app/$app-$version.tar.gz as $package_states->{$mark}");
        print "Marked $config->{repository}/$app/$app-$version.tar.gz as $package_states->{$mark}\n";
-	 } else {
-	   append_file($package_info, "$mark $config->{repository}/$app/$app-$version.tar.gz\n");
-	   $logger->info("Marked $config->{repository}/$app/$app-$version.tar.gz as $package_states->{$mark}");
-	   print "Marked $config->{repository}/$app/$app-$version.tar.gz as $package_states->{$mark}\n";
-	 }
+   } else {
+     append_file($package_info, "$mark $config->{repository}/$app/$app-$version.tar.gz\n");
+     $logger->info("Marked $config->{repository}/$app/$app-$version.tar.gz as $package_states->{$mark}");
+     print "Marked $config->{repository}/$app/$app-$version.tar.gz as $package_states->{$mark}\n";
+   }
    }
 }
 
@@ -549,8 +549,8 @@ sub build_script {
   my $build_log = shift;
   my $logger = $self->{logger};
   if ( ! -f $bb->{'build_script'} ) {
-	  print "ERROR: the build script $bb->{'build_script'} does not exist\n";
-	  return 1;
+    print "ERROR: the build script $bb->{'build_script'} does not exist\n";
+    return 1;
   } 
 
   # expand build script with macros
@@ -663,7 +663,7 @@ sub update {
     print "Build FAILED\n";
   }
   if ( ! -d $reppath ) {
-	qx{mkdir -p $reppath};
+  qx{mkdir -p $reppath};
   }
   $ret = $self->pack($app, $version);
   if ($ret) {
@@ -722,12 +722,12 @@ sub check_install_dir {
   my $dir = shift;
   # don't install if version already exists
   if ( -d $dir ) {
-	  print "ERROR: $dir already exists\n";
-	  print "Do you want to continue? (type uppercase yes): ";
-	  my $answer = <STDIN>;
-	  if($answer !~ /YES/) {
-	    exit 0;
-	  }
+    print "ERROR: $dir already exists\n";
+    print "Do you want to continue? (type uppercase yes): ";
+    my $answer = <STDIN>;
+    if($answer !~ /YES/) {
+      exit 0;
+    }
   }
   # check if install_path exists
   if(! -d $dir) {
@@ -790,27 +790,27 @@ sub install_requirements {
 
   my $uid = $<;
   if($uid != 0) {
-	return (1, "Only root can install packages\n");
+  return (1, "Only root can install packages\n");
   }
   my $distro = distribution_name();
 
   switch($distro) {
     case "debian" { 
-		qx{apt-get -y install $requirements};
-		$ret = $? >> 8;
-		$error = "FAILED: apt-get -y install $requirements" if($ret);
-	}
-	case "redhat" {
-		qx{yum -y install $requirements};
-		$ret = $? >> 8;
-		$error = "FAILED: apt-get -y install $requirements" if($ret);
-	}
-	case "centos" { 
-		qx{yum -y install $requirements};
-		$ret = $? >> 8;
-		$error = "FAILED: apt-get -y install $requirements" if($ret);
-	}
-	else { $ret = 1; $error = "distro $distro not supported\n"; }
+    qx{apt-get -y install $requirements};
+    $ret = $? >> 8;
+    $error = "FAILED: apt-get -y install $requirements" if($ret);
+  }
+  case "redhat" {
+    qx{yum -y install $requirements};
+    $ret = $? >> 8;
+    $error = "FAILED: apt-get -y install $requirements" if($ret);
+  }
+  case "centos" { 
+    qx{yum -y install $requirements};
+    $ret = $? >> 8;
+    $error = "FAILED: apt-get -y install $requirements" if($ret);
+  }
+  else { $ret = 1; $error = "distro $distro not supported\n"; }
   }
   return ($ret, $error);
 }
@@ -832,7 +832,7 @@ sub build {
   my $bb = $cfg->get_block("config");
 
   if(not defined($bb->{'archive_type'}) 
-	 or $bb->{'archive_type'} eq ""
+   or $bb->{'archive_type'} eq ""
      or not defined($bb->{'install_path'})
      or $bb->{'install_path'} eq ""
      or not defined($bb->{'url'})
@@ -843,14 +843,14 @@ sub build {
      or $bb->{'version'} eq ""
     ) 
   {
-	print "ERROR: Missing mandatory config variable\n";
-	return 1;
+  print "ERROR: Missing mandatory config variable\n";
+  return 1;
   }
 
   if ((not defined($bb->{'build_script'}) or $bb->{'build_script'} eq "")
-	   and (not defined($bb->{'build_opts'}) or $bb->{'build_opts'} eq "") ) {
-	print "ERROR: Missing build_opts or build_script in config file\n";
-	return 1;
+     and (not defined($bb->{'build_opts'}) or $bb->{'build_opts'} eq "") ) {
+  print "ERROR: Missing build_opts or build_script in config file\n";
+  return 1;
   }
 
   my $tmpfile = "/tmp/app.$bb->{'archive_type'}";
@@ -869,14 +869,14 @@ sub build {
 
   # install requirements
   if(defined($bb->{'build_requirements'}) and $bb->{'build_requirements'} ne "") {
-	my ($ret, $error) = $self->install_requirements($bb->{'build_requirements'});
-	if($ret == 0) {
-		print "Requirements installed: OK\n";
-	} else {
-		print "Requirements installed: ERROR\n";
-		print "$error\n";
-		# fail soft
-	}
+  my ($ret, $error) = $self->install_requirements($bb->{'build_requirements'});
+  if($ret == 0) {
+    print "Requirements installed: OK\n";
+  } else {
+    print "Requirements installed: ERROR\n";
+    print "$error\n";
+    # fail soft
+  }
   }
 
   # check if build_script exists and call a different function
@@ -885,7 +885,7 @@ sub build {
   } else {
     # download source
     if($self->download($bb->{'url'}, $tmpfile)) {
-	return 1;
+  return 1;
     }
     # extract source
     my $source = $self->extract_source($build_path, $tmpfile, $bb->{'archive_type'});
@@ -897,13 +897,13 @@ sub build {
     # configure
     $self->configure($build_path, $source, $bb->{'build_opts'}, $build_log);
     # compile
-	$bb->{'make'} = $self->rep_var($bb->{'make'}, $bb);
+  $bb->{'make'} = $self->rep_var($bb->{'make'}, $bb);
     $self->make($build_path, $source, $bb->{'make'}, $build_log);
-	# befor installing check install_path
-	$self->check_install_dir($bb->{'install_path'});
+  # befor installing check install_path
+  $self->check_install_dir($bb->{'install_path'});
     # install
-	# expand install var
-	$bb->{'install'} = $self->rep_var($bb->{'install'}, $bb);
+  # expand install var
+  $bb->{'install'} = $self->rep_var($bb->{'install'}, $bb);
     $self->make_install($build_path, $source, $bb->{'install'}, $build_log);
     $logger->info("Sucessfully installed $bb->{'app'} $bb->{'version'}");
 
@@ -932,8 +932,8 @@ sub get_web_version {
 
   if ( ! -f $self->{web}->{configfile} ) {
     $logger->error("Config file $self->{web}->{configfile} does not exist");
-	print "ERROR: Config file $self->{web}->{configfile} does not exist\n";
-	return 1;
+  print "ERROR: Config file $self->{web}->{configfile} does not exist\n";
+  return 1;
   }
   Config::Simple->import_from($self->{web}->{configfile}, \%cfg);
 
@@ -944,58 +944,58 @@ sub get_web_version {
   }
 
   foreach my $a (keys %$app_hash) {
-	# check for required fields in config
-	if( not defined($app_hash->{$a}->{'source'}) or $app_hash->{$a}->{'source'} eq "" or
-		not defined($app_hash->{$a}->{'regex'}) or $app_hash->{$a}->{'regex'} eq "" or
-		not defined($app_hash->{$a}->{'buildfile'}) or $app_hash->{$a}->{'buildfile'} eq "") {
-		$logger->error("Missing parameter in config file for $a");
-		print "ERROR: Missing parameter in config file for $a\n";
-	} else {
+  # check for required fields in config
+  if( not defined($app_hash->{$a}->{'source'}) or $app_hash->{$a}->{'source'} eq "" or
+    not defined($app_hash->{$a}->{'regex'}) or $app_hash->{$a}->{'regex'} eq "" or
+    not defined($app_hash->{$a}->{'buildfile'}) or $app_hash->{$a}->{'buildfile'} eq "") {
+    $logger->error("Missing parameter in config file for $a");
+    print "ERROR: Missing parameter in config file for $a\n";
+  } else {
       my $version = qx{curl -s $app_hash->{$a}->{'source'} | perl -nle '/$app_hash->{$a}->{'regex'}/ && print \$1'};
       chop($version);
       if ( not defined $version or $version eq "" ) {
-	    $logger->info("Couldn't get version for $app_hash->{$a}->{'source'}");
-		if ( defined $self->{web}->{mailto} and $self->{web}->{mailto} ne "" ) {
-		  $self->mail("Couldn't get version for $app_hash->{$a}->{'source'}\n", $self->{web}->{mailto});
-		}
+      $logger->info("Couldn't get version for $app_hash->{$a}->{'source'}");
+    if ( defined $self->{web}->{mailto} and $self->{web}->{mailto} ne "" ) {
+      $self->mail("Couldn't get version for $app_hash->{$a}->{'source'}\n", $self->{web}->{mailto});
+    }
       } else {
-	    # update buildfile and run build
+      # update buildfile and run build
         my $oldversion = "0";
-		fdo { my ($f, $pos, $line) = @_; 
-				if($line =~ /^version/) {
+    fdo { my ($f, $pos, $line) = @_; 
+        if($line =~ /^version/) {
                    ($oldversion) = $line =~ /^version=\"(.*)\"/;
-			    }
-			} $app_hash->{$a}->{'buildfile'};
-		$logger->debug("file: $oldversion web: $version");
-		if ( $oldversion ne $version ) {
+          }
+      } $app_hash->{$a}->{'buildfile'};
+    $logger->debug("file: $oldversion web: $version");
+    if ( $oldversion ne $version ) {
           edit_file_lines { $_ = "version=\"$version\"\n" if /^version=/ } $app_hash->{$a}->{'buildfile'};
-		  print "INFO: updated buildfile $app_hash->{$a}->{'buildfile'}\n";
-		  $self->update($app_hash->{$a}->{'buildfile'});
-		  # send mail
-		  if ( defined $self->{web}->{mailto} and $self->{web}->{mailto} ne "" ) {
-			$self->mail("Updated $a -> $version\n", $self->{web}->{mailto});
-		  }
-		} else {
-		  # version in buildfile is the same on the web
-		  $logger->info("No need to update $a");
-		  print "INFO: No need to update $a -> web version: $version\n";
-		}
-	  }
+      print "INFO: updated buildfile $app_hash->{$a}->{'buildfile'}\n";
+      $self->update($app_hash->{$a}->{'buildfile'});
+      # send mail
+      if ( defined $self->{web}->{mailto} and $self->{web}->{mailto} ne "" ) {
+      $self->mail("Updated $a -> $version\n", $self->{web}->{mailto});
+      }
+    } else {
+      # version in buildfile is the same on the web
+      $logger->info("No need to update $a");
+      print "INFO: No need to update $a -> web version: $version\n";
+    }
+    }
     }
   }
 }
 
 # routine to send mail
 sub mail {
-	my $self = shift;
-	my $msg = shift;
-	my $to = shift;
-	open(MAIL, "|/usr/sbin/sendmail -t");
+  my $self = shift;
+  my $msg = shift;
+  my $to = shift;
+  open(MAIL, "|/usr/sbin/sendmail -t");
     print MAIL "To: $to\n";
-	print MAIL "From: root\@thorko.de\n";
-	print MAIL "Subject: Updated app\n";
-	print MAIL $msg;
-	close(MAIL);
+  print MAIL "From: root\@thorko.de\n";
+  print MAIL "Subject: Updated app\n";
+  print MAIL $msg;
+  close(MAIL);
 }
 
 1;
