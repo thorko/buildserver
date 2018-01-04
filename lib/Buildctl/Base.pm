@@ -790,27 +790,27 @@ sub install_requirements {
 
   my $uid = $<;
   if($uid != 0) {
-  return (1, "Only root can install packages\n");
+    return (1, "Only root can install packages\n");
   }
   my $distro = distribution_name();
 
   switch($distro) {
     case "debian" { 
-    qx{apt-get -y install $requirements};
-    $ret = $? >> 8;
-    $error = "FAILED: apt-get -y install $requirements" if($ret);
-  }
-  case "redhat" {
-    qx{yum -y install $requirements};
-    $ret = $? >> 8;
-    $error = "FAILED: apt-get -y install $requirements" if($ret);
-  }
-  case "centos" { 
-    qx{yum -y install $requirements};
-    $ret = $? >> 8;
-    $error = "FAILED: apt-get -y install $requirements" if($ret);
-  }
-  else { $ret = 1; $error = "distro $distro not supported\n"; }
+      qx{apt-get -y install $requirements};
+      $ret = $? >> 8;
+      $error = "FAILED: apt-get -y install $requirements" if($ret);
+    }
+    case "redhat" {
+      qx{yum -y install $requirements};
+      $ret = $? >> 8;
+      $error = "FAILED: apt-get -y install $requirements" if($ret);
+    }
+    case "centos" { 
+      qx{yum -y install $requirements};
+      $ret = $? >> 8;
+      $error = "FAILED: apt-get -y install $requirements" if($ret);
+    }
+    else { $ret = 1; $error = "distro $distro not supported\n"; }
   }
   return ($ret, $error);
 }
@@ -932,8 +932,8 @@ sub get_web_version {
 
   if ( ! -f $self->{web}->{configfile} ) {
     $logger->error("Config file $self->{web}->{configfile} does not exist");
-  print "ERROR: Config file $self->{web}->{configfile} does not exist\n";
-  return 1;
+    print "ERROR: Config file $self->{web}->{configfile} does not exist\n";
+    return 1;
   }
   Config::Simple->import_from($self->{web}->{configfile}, \%cfg);
 
@@ -944,43 +944,43 @@ sub get_web_version {
   }
 
   foreach my $a (keys %$app_hash) {
-  # check for required fields in config
-  if( not defined($app_hash->{$a}->{'source'}) or $app_hash->{$a}->{'source'} eq "" or
-    not defined($app_hash->{$a}->{'regex'}) or $app_hash->{$a}->{'regex'} eq "" or
-    not defined($app_hash->{$a}->{'buildfile'}) or $app_hash->{$a}->{'buildfile'} eq "") {
-    $logger->error("Missing parameter in config file for $a");
-    print "ERROR: Missing parameter in config file for $a\n";
-  } else {
+    # check for required fields in config
+    if( not defined($app_hash->{$a}->{'source'}) or $app_hash->{$a}->{'source'} eq "" or
+      not defined($app_hash->{$a}->{'regex'}) or $app_hash->{$a}->{'regex'} eq "" or
+      not defined($app_hash->{$a}->{'buildfile'}) or $app_hash->{$a}->{'buildfile'} eq "") {
+      $logger->error("Missing parameter in config file for $a");
+      print "ERROR: Missing parameter in config file for $a\n";
+    } else {
       my $version = qx{curl -s $app_hash->{$a}->{'source'} | perl -nle '/$app_hash->{$a}->{'regex'}/ && print \$1'};
       chop($version);
       if ( not defined $version or $version eq "" ) {
-      $logger->info("Couldn't get version for $app_hash->{$a}->{'source'}");
-    if ( defined $self->{web}->{mailto} and $self->{web}->{mailto} ne "" ) {
-      $self->mail("Couldn't get version for $app_hash->{$a}->{'source'}\n", $self->{web}->{mailto});
-    }
+        $logger->info("Couldn't get version for $app_hash->{$a}->{'source'}");
+        if ( defined $self->{web}->{mailto} and $self->{web}->{mailto} ne "" ) {
+          $self->mail("Couldn't get version for $app_hash->{$a}->{'source'}\n", $self->{web}->{mailto});
+        }
       } else {
-      # update buildfile and run build
+        # update buildfile and run build
         my $oldversion = "0";
-    fdo { my ($f, $pos, $line) = @_; 
-        if($line =~ /^version/) {
-                   ($oldversion) = $line =~ /^version=\"(.*)\"/;
+        fdo { my ($f, $pos, $line) = @_; 
+          if($line =~ /^version/) {
+            ($oldversion) = $line =~ /^version=\"(.*)\"/;
           }
-      } $app_hash->{$a}->{'buildfile'};
-    $logger->debug("file: $oldversion web: $version");
-    if ( $oldversion ne $version ) {
+        } $app_hash->{$a}->{'buildfile'};
+        $logger->debug("file: $oldversion web: $version");
+        if ( $oldversion ne $version ) {
           edit_file_lines { $_ = "version=\"$version\"\n" if /^version=/ } $app_hash->{$a}->{'buildfile'};
-      print "INFO: updated buildfile $app_hash->{$a}->{'buildfile'}\n";
-      $self->update($app_hash->{$a}->{'buildfile'});
-      # send mail
-      if ( defined $self->{web}->{mailto} and $self->{web}->{mailto} ne "" ) {
-      $self->mail("Updated $a -> $version\n", $self->{web}->{mailto});
+          print "INFO: updated buildfile $app_hash->{$a}->{'buildfile'}\n";
+          $self->update($app_hash->{$a}->{'buildfile'});
+          # send mail
+          if ( defined $self->{web}->{mailto} and $self->{web}->{mailto} ne "" ) {
+            $self->mail("Updated $a -> $version\n", $self->{web}->{mailto});
+          }
+        } else {
+          # version in buildfile is the same on the web
+          $logger->info("No need to update $a");
+          print "INFO: No need to update $a -> web version: $version\n";
+        }
       }
-    } else {
-      # version in buildfile is the same on the web
-      $logger->info("No need to update $a");
-      print "INFO: No need to update $a -> web version: $version\n";
-    }
-    }
     }
   }
 }
@@ -991,7 +991,7 @@ sub mail {
   my $msg = shift;
   my $to = shift;
   open(MAIL, "|/usr/sbin/sendmail -t");
-    print MAIL "To: $to\n";
+  print MAIL "To: $to\n";
   print MAIL "From: root\@thorko.de\n";
   print MAIL "Subject: Updated app\n";
   print MAIL $msg;
